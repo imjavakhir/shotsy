@@ -36,8 +36,6 @@ nonisolated struct Policy: Sendable, Equatable {
     var freeDailyReviews = 30
     /// Saved Smart Collections for free users.
     var freeSmartCollections = 1
-    /// Automatic People grouping preview for free users: at most this many photos are grouped.
-    var freePeoplePreviewPhotos = 200
     /// Quick 20 session size.
     var quickSessionSize = 20
 

@@ -24,7 +24,6 @@ struct ShotsyApp: App {
                 .environment(model.albums)
                 .environment(model.analysis)
                 .environment(model.screenshots)
-                .environment(model.people)
                 .environment(model.collections)
                 .environment(model.compression)
                 .modelContainer(model.container)

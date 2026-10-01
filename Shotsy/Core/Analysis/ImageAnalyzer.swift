@@ -112,18 +112,6 @@ nonisolated enum ImageAnalyzer {
         return request.supportedRecognitionLanguages.map { $0.minimalIdentifier }
     }()
 
-    /// Face locations only. This finds faces; it does not identify anyone.
-    static func detectFaces(_ image: CGImage) async throws -> [(box: CGRect, quality: Double?)] {
-        let faces = try await DetectFaceRectanglesRequest().perform(on: image)
-        guard !faces.isEmpty else { return [] }
-        var quality = DetectFaceCaptureQualityRequest()
-        quality.inputFaceObservations = faces
-        let scored = (try? await quality.perform(on: image)) ?? faces
-        return scored.map { face in
-            (face.boundingBox.cgRect, face.captureQuality.map { Double($0.score) })
-        }
-    }
-
     // MARK: Video
 
     /// File size of a locally available video, read from its file URL. `nil` if the original is only in iCloud,

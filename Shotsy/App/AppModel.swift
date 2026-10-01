@@ -15,7 +15,6 @@ final class AppModel {
     let router: Router
     let analysis: AnalysisCoordinator
     let screenshots: ScreenshotStore
-    let people: PeopleStore
     let collections: SmartCollectionStore
     let compression: CompressionStore
     let reminders: ReminderScheduler
@@ -45,14 +44,12 @@ final class AppModel {
         router = Router()
         analysis = AnalysisCoordinator(container: container, library: library, settings: settings)
         screenshots = ScreenshotStore(context: context)
-        people = PeopleStore(container: container, library: library, settings: settings)
         collections = SmartCollectionStore(context: context)
         compression = CompressionStore(context: context, library: library)
         reminders = ReminderScheduler(settings: settings)
 
         reviews.isPro = { [purchases] in purchases.isPro }
         analysis.isPro = { [purchases] in purchases.isPro }
-        people.isPro = { [purchases] in purchases.isPro }
         library.onAssetsRemoved = { [weak self] removed in self?.assetsRemoved(removed) }
         library.onChange = { [weak self] in self?.analysis.libraryChanged() }
         purchases.onEntitlementChange = { [weak self] entitlement, initial in
@@ -87,7 +84,6 @@ final class AppModel {
         reminders.reconcile()
         if library.access.canRead && !Self.isScreenshotMode {
             analysis.startIfNeeded()
-            people.startIfEnabled()
         }
         // Captures show the results of an earlier scan without starting a new one.
         if library.access.canRead && Self.isScreenshotMode { Task { await analysis.summarize() } }
@@ -106,7 +102,6 @@ final class AppModel {
     private func assetsRemoved(_ removed: Set<String>) {
         reviews.forget(removed)
         analysis.forget(removed)
-        people.forget(removed)
     }
 
     // MARK: Sessions

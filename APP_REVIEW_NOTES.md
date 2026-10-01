@@ -29,7 +29,7 @@ close button. Buying Lifetime doesn't cancel an existing weekly subscription; th
 Manage Subscription.
 
 **Free experience.** Browsing, albums, favorites, On This Day, 30 review decisions per day, manual screenshot
-labels, one Smart Collection, manual People tagging, and reminders are free.
+labels, one Smart Collection, and reminders are free.
 
 **How to test.**
 1. Launch → Continue → Continue → Continue → allow access.
@@ -37,6 +37,5 @@ labels, one Smart Collection, manual People tagging, and reminders are free.
    confirm the system alert.
 3. Settings (gear) → Shotsy Pro → Restore Purchases / paywall.
 
-**Privacy.** No tracking, no analytics SDKs, no ads. The only data that leaves the device is purchase history, which RevenueCat uses to confirm Shotsy Pro (not linked to identity). Recognized text and face data never leave the
-device and are excluded from backups. People is off by default; it finds faces for manual tagging and doesn't
-identify anyone.
+**Privacy.** No tracking, no analytics SDKs, no ads. The only data that leaves the device is purchase history, which RevenueCat uses to confirm Shotsy Pro (not linked to identity). Recognized text never leaves the
+device and is excluded from backups. Shotsy doesn't detect, recognize, or store faces.

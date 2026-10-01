@@ -17,6 +17,8 @@ struct AssetPreviewView: View {
     /// The app's appearance, restored for sheets: the preview itself is always dark.
     @Environment(\.colorScheme) private var outerScheme
     @State private var current: String
+    /// The page on screen, readable at tap time by toolbar actions (see `PreviewSelection`).
+    @State private var selection: PreviewSelection
     @State private var window: [String] = []
     @State private var showAlbumSheet = false
     @State private var message: String?
@@ -35,6 +37,7 @@ struct AssetPreviewView: View {
     init(request: PreviewRequest) {
         self.request = request
         _current = State(initialValue: request.start)
+        _selection = State(initialValue: PreviewSelection(id: request.start))
     }
 
     var body: some View {
@@ -91,6 +94,7 @@ struct AssetPreviewView: View {
                 }
             }
             .onChange(of: current) {
+                selection.id = current
                 recenter()
                 playingID = nil
             }
@@ -129,11 +133,11 @@ struct AssetPreviewView: View {
 
     /// The action row, as system bottom-bar items (each its own glass control).
     @ToolbarContentBuilder private var bottomBar: some ToolbarContent {
-            ToolbarItem(placement: .bottomBar) { FavoriteToolbarButton(assetID: current) }
+            ToolbarItem(placement: .bottomBar) { FavoriteToolbarButton(assetID: current, selection: selection) }
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItem(placement: .bottomBar) {
                 Button("Share", systemImage: "square.and.arrow.up") {
-                    if let asset = library.asset(for: current) { share(asset) }
+                    if let asset = library.asset(for: selection.id) { share(asset) }
                 }
                 .disabled(preparingShare)
             }
@@ -147,7 +151,7 @@ struct AssetPreviewView: View {
             }
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItem(placement: .bottomBar) {
-                MarkToolbarButton(assetID: current, onLimit: { showLimit = true }, flash: flash)
+                MarkToolbarButton(assetID: current, selection: selection, onLimit: { showLimit = true }, flash: flash)
             }
     }
 
@@ -192,6 +196,12 @@ struct AssetPreviewView: View {
     }
 }
 
+/// The item on screen, as a reference: toolbar actions read it when tapped rather than capturing a value.
+private final class PreviewSelection {
+    var id: String
+    init(id: String) { self.id = id }
+}
+
 /// Date and time of the current item. Separate so library changes re-render only this, not the pager.
 private struct PreviewTitle: View {
     let assetID: String
@@ -213,14 +223,16 @@ private struct PreviewTitle: View {
 /// Favorite toggle. Observes favorites itself, so toggling re-renders only this button.
 private struct FavoriteToolbarButton: View {
     let assetID: String
+    let selection: PreviewSelection
     @Environment(PhotoLibrary.self) private var library
 
     var body: some View {
-        let asset = library.asset(for: assetID)
-        let favorite = asset.map(library.isFavorite) ?? false
+        let favorite = library.asset(for: assetID).map(library.isFavorite) ?? false
         Button(favorite ? "Unfavorite" : "Favorite", systemImage: favorite ? "heart.fill" : "heart") {
-            guard let asset else { return }
-            Task { try? await library.setFavorite([asset], !favorite) }
+            // Read the item and its state now: the bar item's action may predate the last render.
+            guard let asset = library.asset(for: selection.id) else { return }
+            let now = library.isFavorite(asset)
+            Task { try? await library.setFavorite([asset], !now) }
         }
         .tint(favorite ? Brand.blush : nil)
         .sensoryFeedback(.selection, trigger: favorite)
@@ -230,6 +242,7 @@ private struct FavoriteToolbarButton: View {
 /// Mark for deletion / unmark. Observes review decisions itself.
 private struct MarkToolbarButton: View {
     let assetID: String
+    let selection: PreviewSelection
     let onLimit: () -> Void
     let flash: (String) -> Void
     @Environment(ReviewStore.self) private var reviews
@@ -237,12 +250,14 @@ private struct MarkToolbarButton: View {
     var body: some View {
         let marked = reviews.decision(for: assetID) == .marked
         Button(marked ? "Unmark" : "Mark for deletion", systemImage: marked ? "trash.slash" : "trash") {
-            if marked {
-                reviews.unmark([assetID])
+            // Read the item and its state now: the bar item's action may predate the last render.
+            let id = selection.id
+            if reviews.decision(for: id) == .marked {
+                reviews.unmark([id])
                 flash(String(localized: "Removed from the deletion queue"))
             } else {
                 do {
-                    try reviews.decide(.marked, ids: [assetID])
+                    try reviews.decide(.marked, ids: [id])
                     flash(String(localized: "Marked for deletion. Nothing is deleted until you review."))
                 } catch {
                     onLimit()

@@ -4,21 +4,21 @@ Working record for the production brief (Shotsy-Claude-Production-Prompt-2.md). 
 
 ## Status
 - [x] Project: app + widget extension + tests targets, Owner.xcconfig, entitlements (App Group), StoreKit config, shared scheme (`tools/generate_project.py`)
-- [x] Core: SwiftData schema v1 + migration plan (main store + backup-excluded derived store), PhotoKit services, review engine (quota/undo), StoreKit 2 entitlements, analysis (feature prints, blur, OCR, video sizes), screenshot classifier, smart rules, On This Day, People (detection + pluggable embedder + manual corrections), compression, reminders, widget snapshot
-- [x] UI: onboarding, Clean, sort session, review deletions, categories, Screenshot Inbox, On This Day, Library, preview, People, Albums, Smart Collections, compression, Settings, paywall
+- [x] Core: SwiftData schema v1 + migration plan (main store + backup-excluded derived store), PhotoKit services, review engine (quota/undo), StoreKit 2 entitlements, analysis (feature prints, blur, OCR, video sizes), screenshot classifier, smart rules, On This Day, People (removed 2026-10-01), compression, reminders, widget snapshot
+- [x] UI: onboarding, Clean, sort session, review deletions, categories, Screenshot Inbox, On This Day, Library, preview, Albums, Smart Collections, compression, Settings, paywall
 - [x] Widget UI (small/medium), notification deep links
 - [x] String Catalog plurals (English), privacy manifest
 - [x] 66 tests / 13 suites passing; 0 warnings; README, APP_REVIEW_NOTES
 - [ ] Owner values (bundle ID, team, App Group, product IDs, legal URLs)
 - [ ] Device testing, iOS 27, StoreKit end-to-end, VoiceOver/Dynamic Type passes
-- [ ] Face-embedding model (licensed) for automatic People grouping
 
 ## Decisions
-- Face grouping: Vision has no public face-identity embedding API (checked iOS 26.5 SDK). No face-embedding model with verified commercial redistribution rights for weights was available at zero cost, so none is bundled. `FaceEmbedderProvider` loads `ShotsyFaceEmbedder.mlmodelc` if one is added later. Manual tagging is complete; automatic grouping is an open dependency.
+- People (face tagging) removed on 2026-10-01 (owner decision). Shotsy no longer detects, groups, or stores faces.
 - iOS 27 SDK/runtime not installed → iOS 27 builds/tests unverified.
 - Byte sizes: no private KVC. Videos use the local file URL size; photo sizes aren't shown.
 
 ## Log
+- 2026-10-01: People removed (owner decision): face detection, PeopleStore/worker, FaceGrouper/FaceEmbedder, People screens, Library People row/person filter/search, Smart Collection person rules, Settings → People, paywall reason, `freePeoplePreviewPhotos`, People tests, and face mentions in onboarding, privacy summary, docs, and App Store text. SwiftData `SchemaV2` drops `PersonRecord`/`FaceRecord` via a lightweight V1 → V2 stage (`SchemaV1` kept frozen; derived store can be recreated as a fallback); leftover `faces.*` index rows and the `people` default are removed at launch. Saved 1.0 Smart Collections drop person rules instead of failing to decode. Migration test added. 56 unused strings removed from the catalog.
 - 2026-10-01 (later): Photo Info sheet (measured size, EXIF, albums) + HEIC→JPG copy; swipe up to add to album; Clean tab month cards with fanned previews; Bursts, Screen Recordings, Slo-mo categories; "Free up about X" (videos measured, photos estimated). Burst batch marking is Pro like Similar. Full-bleed preview with Liquid Glass chrome and tap-to-hide. Perf pass: Clean tab pauses during sorting, month sections cached, summary PhotoKit reads off main, incremental decision sync with O(1) pendingCount, deck drag isolated in CardDeck, lazy rows in categories. 109 tests.
 - 2026-10-01: App Review rejection (5.1.1 "Connect Photos" button, 2.1 paywall showed RevenueCat error: StoreKit returned no products on iPad review; ASC/RevenueCat config verified correct). Permission buttons now "Continue"; paywall retries and shows a short message. Sync: no library re-fetch on foreground, analysis only for inserted/edited assets, no restart on launch entitlement, time-throttled summaries, failed items retried once per launch, new Settings → Sync (Scan automatically, Pause in Low Power Mode, Scan Now). Screens load off main with debounced reloads. Fixed crash on reminder tap (async UNUserNotificationCenter delegate). Review: Unmark unselected / Unmark All / post-delete choice. People: multi-select tagging, name reuse. Favorites flip instantly via pending state and don't trigger scans.
 - 2026-09-28: Full build. Found & fixed: non-square grid cells; soft card image (exact-size requests for large views);

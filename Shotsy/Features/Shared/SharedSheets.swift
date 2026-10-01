@@ -167,7 +167,7 @@ struct ShareAssetsButton: View {
 }
 
 enum LimitedLibrary {
-    /// Lets people with limited access change which photos Shotsy can see.
+    /// Lets users with limited access change which photos Shotsy can see.
     static func presentPicker() {
         guard let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
               var top = scene.keyWindow?.rootViewController else { return }
@@ -176,39 +176,43 @@ enum LimitedLibrary {
     }
 }
 
-/// Face crop from a photo, using a normalized Vision box (origin bottom-left).
-struct FaceCropView: View {
-    let assetID: String
-    let box: CGRect?
+/// Multi-select picker over the library (used for "Add photos" to an album).
+struct AssetPickerSheet: View {
+    let title: String
+    var filter: MediaFilter = .all
+    let onPick: ([String]) -> Void
 
     @Environment(PhotoLibrary.self) private var library
-    @State private var image: UIImage?
+    @Environment(\.dismiss) private var dismiss
+    @State private var ids: [String] = []
+    @State private var selection = Set<String>()
 
     var body: some View {
-        Circle()
-            .fill(Color.appChip)
-            .overlay {
-                if let image {
-                    Image(uiImage: image).resizable().scaledToFill()
-                } else {
-                    Image(systemName: "person.crop.circle").foregroundStyle(Color.appSecondaryText)
+        NavigationStack {
+            AssetIDGrid(ids: ids, selection: $selection, selectionMode: true) { _ in }
+                .navigationTitle(title)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Add \(selection.count)") { onPick(Array(selection)); dismiss() }
+                            .disabled(selection.isEmpty)
+                    }
                 }
-            }
-            .clipShape(Circle())
-            .task(id: assetID) { await load() }
-            .accessibilityHidden(true)
-    }
-
-    private func load() async {
-        guard let asset = library.asset(for: assetID) else { return }
-        let stream = ImageStream.images(for: asset, targetSize: CGSize(width: 600, height: 600), contentMode: .aspectFit,
-                                        options: ThumbnailCache.gridOptions(), manager: ThumbnailCache.shared.manager)
-        var last: UIImage?
-        for await update in stream { if let i = update.image { last = i } }
-        guard let full = last?.cgImage else { return }
-        guard let box else { image = last; return }
-        if let crop = FaceCrop.crop(full, box: box, side: 200, margin: 0.35) {
-            image = UIImage(cgImage: crop)
+                .task {
+                    let result = library.fetch(filter)
+                    ids = await BackgroundFetch.run {
+                        let limit = min(result.count, 3000)
+                        return limit > 0 ? result.objects(at: IndexSet(integersIn: 0..<limit)).map(\.localIdentifier) : []
+                    }
+                }
         }
+    }
+}
+
+extension String {
+    var trimmedNonEmpty: String? {
+        let t = trimmingCharacters(in: .whitespacesAndNewlines)
+        return t.isEmpty ? nil : t
     }
 }

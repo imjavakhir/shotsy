@@ -37,9 +37,20 @@ nonisolated enum SmartRule: Codable, Hashable, Sendable {
     case screenshotCategory(ScreenshotCategory)
     case screenshotLabel(String)
     case pinned
-    case person(id: UUID, name: String)
     case videoLongerThan(seconds: Double)
     case videoLargerThan(bytes: Int64)
+}
+
+extension SmartRule {
+    /// Decodes a saved rule list, dropping rules this version doesn't know instead of failing the whole list.
+    /// Collections saved by 1.0 builds can contain `person` rules from the removed face-tagging feature.
+    static func decodeList(from data: Data) -> [SmartRule] {
+        struct Lossy: Decodable {
+            let rule: SmartRule?
+            init(from decoder: Decoder) throws { rule = try? SmartRule(from: decoder) }
+        }
+        return ((try? JSONDecoder().decode([Lossy].self, from: data)) ?? []).compactMap(\.rule)
+    }
 }
 
 nonisolated enum Tri: Equatable, Sendable {
@@ -68,7 +79,6 @@ nonisolated struct RuleContext: Sendable {
     var screenshotCategories: [String: ScreenshotCategory] = [:]
     var screenshotLabels: [String: [String]] = [:]
     var pinned: Set<String> = []
-    var personAssets: [UUID: Set<String>] = [:]
     var videoBytes: [String: Int64] = [:]
 }
 
@@ -119,9 +129,6 @@ nonisolated enum SmartRuleEngine {
             return (ctx.screenshotLabels[a.id] ?? []).contains(label) ? .yes : .no
         case .pinned:
             return ctx.pinned.contains(a.id) ? .yes : .no
-        case .person(let id, _):
-            guard let assets = ctx.personAssets[id] else { return .unknown }
-            return assets.contains(a.id) ? .yes : .no
         case .videoLongerThan(let seconds):
             guard a.isVideo else { return .no }
             return a.duration > seconds ? .yes : .no
@@ -198,7 +205,6 @@ nonisolated enum SmartRuleEngine {
         case .screenshotCategory(let c): return String(localized: "Screenshot category is \(String(localized: c.title))")
         case .screenshotLabel(let l): return String(localized: "Screenshot label is \"\(l)\"")
         case .pinned: return String(localized: "Pinned screenshot")
-        case .person(_, let name): return String(localized: "Includes \(name)")
         case .videoLongerThan(let s): return String(localized: "Video longer than \(AssetDescription.duration(s))")
         case .videoLargerThan(let b):
             return String(localized: "Video larger than \(ByteCountFormatter.string(fromByteCount: b, countStyle: .file))")

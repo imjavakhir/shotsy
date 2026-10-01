@@ -31,10 +31,6 @@
     "one": "%lld original couldn't be read, so it stays unverified.",
     "other": "%lld originals couldn't be read, so those stay unverified."
   },
-  "%lld people": {
-    "one": "%lld person",
-    "other": "%lld people"
-  },
   "%lld photos": {
     "one": "%lld photo",
     "other": "%lld photos"
@@ -66,10 +62,6 @@
   "%lld years ago": {
     "one": "%lld year ago",
     "other": "%lld years ago"
-  },
-  "Automatic grouping preview covers up to %lld photos. Shotsy Pro groups your whole library.": {
-    "one": "Automatic grouping preview covers up to %lld photo. Shotsy Pro groups your whole library.",
-    "other": "Automatic grouping preview covers up to %lld photos. Shotsy Pro groups your whole library."
   },
   "Create album with %lld items": {
     "one": "Create album with %lld item",

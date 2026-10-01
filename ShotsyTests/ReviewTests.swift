@@ -4,7 +4,7 @@ import Testing
 @testable import Shotsy
 
 private let day = "2026-09-28"
-private let policy = Policy(freeDailyReviews: 3, freeSmartCollections: 1, freePeoplePreviewPhotos: 10, quickSessionSize: 20)
+private let policy = Policy(freeDailyReviews: 3, freeSmartCollections: 1, quickSessionSize: 20)
 
 @Suite("Swipe, undo and quota")
 struct ReviewLedgerTests {

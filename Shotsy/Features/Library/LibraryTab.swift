@@ -2,8 +2,6 @@ import Photos
 import SwiftUI
 
 enum LibraryRoute: Hashable {
-    case people
-    case person(UUID)
     case assets(title: String, ids: [String])
     case album(String)
 }
@@ -24,12 +22,10 @@ struct LibraryTab: View {
     @Environment(Router.self) private var router
     @Environment(PhotoLibrary.self) private var library
     @Environment(ReviewStore.self) private var reviews
-    @Environment(PeopleStore.self) private var people
     @Environment(SettingsStore.self) private var settings
     @Environment(\.dynamicTypeSize) private var dynamicType
 
     @State private var filter: MediaFilter = .all
-    @State private var personFilter: UUID?
     @State private var ascending = false
     @State private var slice = LibrarySlice()
     @State private var loading = true
@@ -59,13 +55,11 @@ struct LibraryTab: View {
             .toolbar { toolbar }
             .navigationDestination(for: LibraryRoute.self) { route in
                 switch route {
-                case .people: PeopleView()
-                case .person(let id): PersonDetailView(personID: id)
                 case .assets(let title, let ids): AssetListScreen(title: title, ids: ids)
                 case .album(let id): AlbumDetailView(albumID: id)
                 }
             }
-            .task(id: "\(filter)-\(personFilter?.uuidString ?? "")-\(ascending)-\(library.changeCount)-\(filter == .unreviewed ? reviews.revision : 0)") {
+            .task(id: "\(filter)-\(ascending)-\(library.changeCount)-\(filter == .unreviewed ? reviews.revision : 0)") {
                 await reload()
             }
             .sheet(isPresented: $showAlbumSheet) {
@@ -84,18 +78,8 @@ struct LibraryTab: View {
         GeometryReader { geo in
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: Space.s) {
-                    if !selecting && personFilter == nil {
-                        PeopleEntryRow()
-                            .padding(.horizontal, Space.page)
-                    }
                     if library.access == .limited {
                         AccessBanner().padding(.horizontal, Space.page)
-                    }
-                    if let personFilter, let person = people.people.first(where: { $0.id == personFilter }) {
-                        Notice(kind: .info, text: "Showing photos with \(person.displayName)", actionTitle: "Clear") {
-                            self.personFilter = nil
-                        }
-                        .padding(.horizontal, Space.page)
                     }
                     if loading && slice.count == 0 {
                         ProgressView().frame(maxWidth: .infinity).padding(.top, Space.xxl)
@@ -143,19 +127,12 @@ struct LibraryTab: View {
                 Picker("Show", selection: $filter) {
                     ForEach(MediaFilter.allCases) { f in Label(String(localized: f.title), systemImage: f.systemImage).tag(f) }
                 }
-                let named = people.people.filter { $0.name != nil }
-                if !named.isEmpty {
-                    Picker("Person", selection: $personFilter) {
-                        Text("Anyone").tag(UUID?.none)
-                        ForEach(named) { Text($0.displayName).tag(UUID?.some($0.id)) }
-                    }
-                }
                 Picker("Order", selection: $ascending) {
                     Text("Newest first").tag(false)
                     Text("Oldest first").tag(true)
                 }
             } label: {
-                Label("Filter", systemImage: filter == .all && personFilter == nil
+                Label("Filter", systemImage: filter == .all
                       ? "line.3.horizontal.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
             }
         }
@@ -215,19 +192,17 @@ struct LibraryTab: View {
         let fetch = library.fetch(filter, ascending: ascending)
         // "Unreviewed" (the fetch is every photo/video) is filtered in the background pass below.
         let reviewed: [String: ReviewDecision]? = filter == .unreviewed ? reviews.ledger.decisions : nil
-        let person: Set<String>? = personFilter.map { Set(people.assetIDs(of: $0)) }
         let result = fetch
         let selected = selection
         let (map, sections, kept) = await Task.detached(priority: .userInitiated) { () -> ([Int]?, [MonthSection], Set<String>) in
             var dates: [Date?] = []
             var kept = Set<String>()
-            var map: [Int]? = reviewed == nil && person == nil ? nil : []
+            var map: [Int]? = reviewed == nil ? nil : []
             dates.reserveCapacity(result.count)
             result.enumerateObjects { a, i, _ in
                 if map != nil {
                     let id = a.localIdentifier
                     if let reviewed, reviewed[id] != nil { return }
-                    if let person, !person.contains(id) { return }
                     map?.append(i)
                 }
                 if !selected.isEmpty, selected.contains(a.localIdentifier) { kept.insert(a.localIdentifier) }
@@ -264,47 +239,13 @@ private struct MonthHeader: View {
     }
 }
 
-private struct PeopleEntryRow: View {
-    @Environment(PeopleStore.self) private var people
-    @Environment(Router.self) private var router
-
-    var body: some View {
-        Button { router.libraryPath.append(LibraryRoute.people) } label: {
-            HStack(spacing: Space.s) {
-                HStack(spacing: -10) {
-                    ForEach(people.people.prefix(3)) { p in
-                        if let face = p.coverFace {
-                            FaceCropView(assetID: face.assetID, box: face.box)
-                                .frame(width: 34, height: 34)
-                                .overlay(Circle().stroke(Color.appSurface, lineWidth: 2))
-                        }
-                    }
-                    if people.people.isEmpty {
-                        Image(systemName: "person.2.crop.square.stack").font(.title2).foregroundStyle(Color.appAccent)
-                    }
-                }
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("People").font(.appHeadline).foregroundStyle(Color.appText)
-                    Text(people.people.isEmpty ? "Tag the people in your photos" : "\(people.people.count) people")
-                        .font(.appFootnote).foregroundStyle(Color.appSecondaryText)
-                }
-                Spacer()
-                Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Color.appSecondaryText)
-            }
-            .card(padding: Space.s)
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-/// Search across album names, dates (months/years), people names, and screenshot text (Pro).
+/// Search across album names, dates (months/years), and screenshot text (Pro).
 private struct LibrarySearchResults: View {
     let query: String
     let slice: LibrarySlice
 
     @Environment(AlbumService.self) private var albums
     @Environment(ScreenshotStore.self) private var screenshots
-    @Environment(PeopleStore.self) private var people
     @Environment(PurchaseStore.self) private var purchases
     @Environment(AnalysisCoordinator.self) private var analysis
     @Environment(Router.self) private var router
@@ -316,7 +257,6 @@ private struct LibrarySearchResults: View {
         let q = query.trimmingCharacters(in: .whitespaces)
         let albumHits = allAlbums.filter { $0.title.localizedStandardContains(q) }
         let monthHits = slice.sections.filter { $0.title.localizedStandardContains(q) || $0.key.contains(q) }
-        let peopleHits = people.people.filter { ($0.name ?? "").localizedStandardContains(q) }
         List {
             if !albumHits.isEmpty {
                 Section("Albums") {
@@ -333,13 +273,6 @@ private struct LibrarySearchResults: View {
                         NavigationLink(value: LibraryRoute.assets(title: section.title, ids: slice.ids(in: section.range))) {
                             LabeledContent(section.title, value: "\(section.count)")
                         }
-                    }
-                }
-            }
-            if !peopleHits.isEmpty {
-                Section("People") {
-                    ForEach(peopleHits) { p in
-                        NavigationLink(value: LibraryRoute.person(p.id)) { LabeledContent(p.displayName, value: "\(p.photoCount)") }
                     }
                 }
             }

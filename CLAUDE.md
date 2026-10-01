@@ -16,10 +16,9 @@ Native SwiftUI photo organizer for iOS 26+. Read `README.md` (features, owner co
   `DeletionService` (revalidate → PhotoKit system confirmation) from the review flow.
 - Every review decision goes through `ReviewStore`/`ReviewLedger` (shared free quota, undo, persistence).
 - Pro gating reads `PurchaseStore.isPro` (RevenueCat entitlement `shotsy_pro`; the key is in `OwnerConfig`). Never add a local premium flag or a second entitlement system.
-  Limits never block undo, corrections, queued deletions, or deleting People data.
+  Limits never block undo, corrections, or queued deletions.
 - All main scroll containers use `.softAppBar()` (native `.scrollEdgeEffectStyle(.soft, for: .top)`).
 - Colors come from semantic tokens in `DesignSystem/Brand.swift` (light + dark). Never white text on lilac.
   One animated mascot per screen; static `ShotsyMascot` elsewhere.
 - No private APIs (no KVC `fileSize`). Byte counts shown are measured or labeled estimates.
-- No network except Photos/iCloud downloads, the App Store, and RevenueCat (purchases only). Never log recognized text, faces, names, or identifiers.
-- People: no face-embedding model is bundled (see README). Don't fake automatic grouping.
+- No network except Photos/iCloud downloads, the App Store, and RevenueCat (purchases only). Never log recognized text or identifiers.

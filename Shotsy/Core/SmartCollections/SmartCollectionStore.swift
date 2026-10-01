@@ -23,7 +23,7 @@ final class SmartCollectionStore {
         let records = (try? context.fetch(FetchDescriptor<SmartCollectionRecord>(sortBy: [SortDescriptor(\.sortIndex)]))) ?? []
         collections = records.map { r in
             SmartCollection(id: r.id, name: r.name, matchAll: r.matchAll,
-                            rules: (try? JSONDecoder().decode([SmartRule].self, from: r.rulesData)) ?? [])
+                            rules: SmartRule.decodeList(from: r.rulesData))
         }
     }
 

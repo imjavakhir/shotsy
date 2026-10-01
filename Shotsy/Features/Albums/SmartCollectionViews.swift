@@ -17,7 +17,7 @@ enum SmartCollectionEvaluator {
 
     /// Album membership and the screenshot index are read off the main thread.
     static func context(for rules: [SmartRule], reviews: ReviewStore, screenshots: ScreenshotStore,
-                        people: PeopleStore, analysis: AnalysisCoordinator, suggestionsEnabled: Bool) async -> RuleContext {
+                        analysis: AnalysisCoordinator, suggestionsEnabled: Bool) async -> RuleContext {
         var ctx = RuleContext()
         ctx.decisions = reviews.ledger.decisions
         var screenshotSnapshot: ScreenshotSnapshot?
@@ -38,8 +38,6 @@ enum SmartCollectionEvaluator {
                         ctx.screenshotCategories[id] = c
                     }
                 }
-            case .person:
-                ctx.personAssets = people.assetMap()
             case .videoLargerThan:
                 for v in analysis.summary.largeVideos { if let b = v.bytes { ctx.videoBytes[v.id] = b } }
             default:
@@ -58,7 +56,6 @@ struct SmartCollectionDetailView: View {
     @Environment(ReviewStore.self) private var reviews
     @Environment(AlbumService.self) private var albums
     @Environment(ScreenshotStore.self) private var screenshots
-    @Environment(PeopleStore.self) private var people
     @Environment(AnalysisCoordinator.self) private var analysis
     @Environment(PurchaseStore.self) private var purchases
     @Environment(SettingsStore.self) private var settings
@@ -120,7 +117,7 @@ struct SmartCollectionDetailView: View {
         } message: {
             Text("This makes a regular Photos album with today's matches. Unlike the Smart Collection, it won't update.")
         }
-        .task(id: "\(collection?.rules.hashValue ?? 0)-\(collection?.matchAll ?? true)-\(library.changeCount)-\(reviews.revision)-\(screenshots.revision)-\(people.revision)") {
+        .task(id: "\(collection?.rules.hashValue ?? 0)-\(collection?.matchAll ?? true)-\(library.changeCount)-\(reviews.revision)-\(screenshots.revision)") {
             guard let collection,
                   await BackgroundFetch.settle(changeCount: library.changeCount, loadedChangeCount: loadedChange) else { return }
             let change = library.changeCount
@@ -128,7 +125,7 @@ struct SmartCollectionDetailView: View {
             let all = library.allAssets
             async let facts = BackgroundFetch.run { SmartCollectionEvaluator.facts(in: all) }
             let ctx = await SmartCollectionEvaluator.context(for: collection.rules, reviews: reviews, screenshots: screenshots,
-                                                             people: people, analysis: analysis,
+                                                             analysis: analysis,
                                                              suggestionsEnabled: purchases.isPro && settings.ocrEnabled)
             let matched = await SmartCollectionStore.evaluate(collection, facts: facts, context: ctx)
             guard !Task.isCancelled else { return }
@@ -157,7 +154,6 @@ struct SmartCollectionEditor: View {
 
     @Environment(SmartCollectionStore.self) private var store
     @Environment(AlbumService.self) private var albums
-    @Environment(PeopleStore.self) private var people
     @Environment(ScreenshotStore.self) private var screenshots
     @Environment(\.dismiss) private var dismiss
     @State private var days = 30
@@ -222,12 +218,6 @@ struct SmartCollectionEditor: View {
                         }
                     }
                     Button("Pinned screenshots") { add(.pinned) }
-                    let named = people.people.filter { $0.name != nil }
-                    if !named.isEmpty {
-                        Menu("Person") {
-                            ForEach(named) { p in Button(p.displayName) { add(.person(id: p.id, name: p.displayName)) } }
-                        }
-                    }
                     Stepper("Video minutes: \(Int(minutes))", value: $minutes, in: 1...120)
                     Button("Video longer than \(Int(minutes)) min") { add(.videoLongerThan(seconds: minutes * 60)) }
                     Stepper("Video MB: \(Int(megabytes))", value: $megabytes, in: 50...10_000, step: 50)

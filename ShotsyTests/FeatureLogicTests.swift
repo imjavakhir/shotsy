@@ -132,9 +132,21 @@ struct SmartRuleTests {
     }
 
     @Test func rulesRoundTripThroughJSON() throws {
-        let rules: [SmartRule] = [.mediaType(.screenshot), .person(id: UUID(), name: "Ana"), .videoLargerThan(bytes: 5)]
+        let rules: [SmartRule] = [.mediaType(.screenshot), .pinned, .videoLargerThan(bytes: 5)]
         let data = try JSONEncoder().encode(rules)
         #expect(try JSONDecoder().decode([SmartRule].self, from: data) == rules)
+        #expect(SmartRule.decodeList(from: data) == rules)
+    }
+
+    @Test func savedRulesFromOlderVersionsDropUnknownRules() throws {
+        // A 1.0 collection with a rule from the removed face-tagging feature, in the synthesized Codable shape.
+        let known: [SmartRule] = [.mediaType(.screenshot), .pinned]
+        var items = try #require(try JSONSerialization.jsonObject(with: JSONEncoder().encode(known)) as? [Any])
+        items.insert(["person": ["id": UUID().uuidString, "name": "Ana"]], at: 1)
+        let saved = try JSONSerialization.data(withJSONObject: items)
+        #expect(throws: (any Error).self) { try JSONDecoder().decode([SmartRule].self, from: saved) }
+        #expect(SmartRule.decodeList(from: saved) == known)
+        #expect(SmartRule.decodeList(from: Data("not json".utf8)).isEmpty)
     }
 }
 
@@ -235,48 +247,6 @@ struct CleanupAlgorithmTests {
         for y in 0..<h { for x in 0..<w where (x + y) % 2 == 0 { checker[y * w + x] = 255 } }
         #expect(BlurMetric.laplacianVariance(gray: flat, width: w, height: h) == 0)
         #expect(BlurMetric.laplacianVariance(gray: checker, width: w, height: h) > SimilarityTuning.blurThreshold)
-    }
-}
-
-// MARK: - People
-
-@Suite("Face grouping")
-struct FaceGrouperTests {
-    func face(_ v: [Float], manual: UUID? = nil, rejected: Set<UUID> = []) -> FaceGrouper.Face {
-        FaceGrouper.Face(id: UUID(), embedding: v, manualPerson: manual, rejected: rejected)
-    }
-
-    @Test func groupsCloseFacesAndLeavesSingletonsUngrouped() {
-        let a1 = face([1, 0, 0]), a2 = face([0.98, 0.02, 0]), b = face([0, 1, 0])
-        let result = FaceGrouper.group([a1, a2, b], threshold: 0.1)
-        #expect(Set(result.map(\.faceID)) == [a1.id, a2.id])
-        #expect(Set(result.compactMap(\.newGroup)).count == 1)
-    }
-
-    @Test func manualAssignmentsAreKeptAndAttract() {
-        let ana = UUID()
-        let m = face([1, 0], manual: ana)
-        let auto = face([0.99, 0.01])
-        let result = FaceGrouper.group([m, auto], threshold: 0.1)
-        #expect(result == [FaceGrouper.Assignment(faceID: auto.id, person: ana, newGroup: nil)])
-    }
-
-    @Test func rejectionIsRespected() {
-        let ana = UUID()
-        let m = face([1, 0], manual: ana)
-        let rejected = face([0.99, 0.01], rejected: [ana])
-        #expect(FaceGrouper.group([m, rejected], threshold: 0.1).isEmpty)
-    }
-
-    @Test func chainOfWeakMatchesDoesNotMergeStrangers() {
-        // Each step is close to the previous, but the ends are far apart.
-        let steps: [[Float]] = (0..<6).map { i in
-            let angle = Float(i) * 0.35
-            return [cos(angle), sin(angle)]
-        }
-        let result = FaceGrouper.group(steps.map { face($0) }, threshold: 0.08)
-        let groups = Dictionary(grouping: result, by: { $0.newGroup })
-        #expect(groups.values.allSatisfy { $0.count <= 3 })
     }
 }
 

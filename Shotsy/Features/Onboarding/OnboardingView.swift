@@ -77,7 +77,7 @@ struct OnboardingView: View {
                 feature("rectangle.stack", "Albums that make sense",
                         "Add photos to albums, and save smart filters that update themselves.")
                 feature("iphone", "Analysis stays on this iPhone",
-                        "Similar photos, screenshot text, and faces are analyzed on device. Shotsy changes your library only when you choose an action.")
+                        "Similar photos and screenshot text are analyzed on device. Shotsy changes your library only when you choose an action.")
             }
             .padding(.horizontal, Space.xl)
         }

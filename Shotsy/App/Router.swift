@@ -6,7 +6,7 @@ enum AppTab: Hashable {
 
 /// Why the paywall was shown; drives its headline.
 enum PaywallReason: String, Identifiable {
-    case dailyLimit, batchCleanup, ocrSearch, categorySuggestions, smartCollections, people, compression, settings
+    case dailyLimit, batchCleanup, ocrSearch, categorySuggestions, smartCollections, compression, settings
 
     var id: String { rawValue }
 }

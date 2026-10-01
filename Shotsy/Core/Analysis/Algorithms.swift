@@ -59,14 +59,6 @@ nonisolated enum VectorMath {
         return vDSP.distanceSquared(a, b).squareRoot()
     }
 
-    static func cosineDistance(_ a: [Float], _ b: [Float]) -> Float {
-        guard a.count == b.count, !a.isEmpty else { return .infinity }
-        let dot = vDSP.dot(a, b)
-        let na = vDSP.sumOfSquares(a), nb = vDSP.sumOfSquares(b)
-        guard na > 0, nb > 0 else { return .infinity }
-        return 1 - dot / (na.squareRoot() * nb.squareRoot())
-    }
-
     static func floats(from data: Data) -> [Float] {
         data.withUnsafeBytes { Array($0.bindMemory(to: Float.self)) }
     }

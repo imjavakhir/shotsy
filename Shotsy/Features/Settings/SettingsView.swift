@@ -7,7 +7,6 @@ struct SettingsView: View {
     @Environment(PhotoLibrary.self) private var library
     @Environment(PurchaseStore.self) private var purchases
     @Environment(AnalysisCoordinator.self) private var analysis
-    @Environment(PeopleStore.self) private var people
     @Environment(Router.self) private var router
     @Environment(\.dismiss) private var dismiss
 
@@ -18,7 +17,7 @@ struct SettingsView: View {
     @State private var reminderDenied = false
 
     enum Confirm: Identifiable {
-        case clearCache, deletePeople, resetHistory
+        case clearCache, resetHistory
         var id: Self { self }
     }
 
@@ -93,20 +92,6 @@ struct SettingsView: View {
                 }
 
                 Section {
-                    Toggle("People", isOn: Binding(get: { settings.peopleEnabled }, set: { on in
-                        if on { settings.peopleEnabled = true; people.startIfEnabled() } else { people.disable() }
-                    }))
-                    if case .detecting = people.phase { Button("Pause face finding") { people.pause() } }
-                    Button("Delete People data", role: .destructive) { confirm = .deletePeople }
-                } header: {
-                    Text("People")
-                } footer: {
-                    Text(people.automaticGroupingAvailable
-                         ? "Faces and names are stored only on this iPhone and excluded from backups."
-                         : "Shotsy finds faces on device; you tag who they are. Automatic grouping isn't available in this version. Face data is excluded from backups.")
-                }
-
-                Section {
                     Toggle("Reminders", isOn: Binding(get: { settings.remindersEnabled }, set: { on in
                         Task {
                             if on {
@@ -167,15 +152,12 @@ struct SettingsView: View {
                 switch item {
                 case .clearCache:
                     Button("Clear cache", role: .destructive) { Task { await analysis.clearCache() } }
-                case .deletePeople:
-                    Button("Delete People data", role: .destructive) { people.deleteAllData() }
                 case .resetHistory:
                     Button("Reset history", role: .destructive) { model.reviews.resetHistory() }
                 }
             } message: { item in
                 switch item {
                 case .clearCache: Text("Similar-photo, blur, and screenshot-text results will be rebuilt. Your labels and corrections stay.")
-                case .deletePeople: Text("Removes faces, names, and groups. Your photos aren't touched.")
                 case .resetHistory: Text("Forgets keep/mark decisions and sessions, including the deletion queue. Your photos aren't touched.")
                 }
             }
@@ -185,7 +167,6 @@ struct SettingsView: View {
     private var confirmTitle: String {
         switch confirm {
         case .clearCache: String(localized: "Clear analysis cache?")
-        case .deletePeople: String(localized: "Delete People data?")
         case .resetHistory: String(localized: "Reset review history?")
         case nil: ""
         }
@@ -302,10 +283,10 @@ struct PrivacySummaryView: View {
     var body: some View {
         List {
             Section {
-                Label("Photos are analyzed on this iPhone: similar photos, blur, screenshot text, and faces.", systemImage: "iphone")
-                Label("Shotsy doesn't send your photos, text, faces, names, or identifiers to any server. There are no analytics SDKs.", systemImage: "lock")
+                Label("Photos are analyzed on this iPhone: similar photos, blur, and screenshot text.", systemImage: "iphone")
+                Label("Shotsy doesn't send your photos, text, or identifiers to any server. There are no analytics SDKs.", systemImage: "lock")
                 Label("Your library changes only when you choose an action. Deletions always go through Apple's confirmation.", systemImage: "hand.raised")
-                Label("Face data and analysis results are excluded from backups and can be deleted in Settings.", systemImage: "externaldrive.badge.xmark")
+                Label("Analysis results are excluded from backups and can be cleared in Settings.", systemImage: "externaldrive.badge.xmark")
                 Label("Network use: Apple Photos may download iCloud originals when you open, share, verify, or compress them. Purchases go through the App Store and RevenueCat.", systemImage: "icloud")
             }
             .font(.appCallout)

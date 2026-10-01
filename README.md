@@ -2,7 +2,7 @@
 
 Native SwiftUI iPhone app (iOS 26.0+) that makes a big camera roll manageable: short swipe-sorting sessions,
 Quick 20, a Screenshot Inbox with on-device text search, similar/duplicate/blurry/large-video cleanup, video
-compression, Smart Collections, On This Day, People tagging, albums, and optional reminders.
+compression, Smart Collections, On This Day, albums, and optional reminders.
 Everything is analyzed on device. No server of our own, no cloud AI, no analytics SDK. Purchases run through RevenueCat.
 
 ## Build and run
@@ -39,7 +39,7 @@ so new files are picked up automatically; only re-run the script to change targe
 | Privacy Policy URL | `OwnerConfig.privacyPolicyURL` | https://sites.google.com/view/shotsy (Google Sites; text in appstore/privacy-policy.html) |
 | Terms of Use | `OwnerConfig.termsURL` | not set → Apple's Standard EULA is linked |
 | Support email | `OwnerConfig.supportEmail` | not set (row hidden) |
-| Free/Pro limits | `Policy` in `OwnerConfig.swift` | 30 reviews/day, 1 Smart Collection, 200-photo People preview |
+| Free/Pro limits | `Policy` in `OwnerConfig.swift` | 30 reviews/day, 1 Smart Collection |
 
 App Store Connect (done 2026-09-28): subscription group "Shotsy Pro" with a **1-week** auto-renewable subscription at
 **USD 1.99**, and a **non-consumable** at **USD 19.99**. No trial, no other plans.
@@ -57,11 +57,10 @@ Local testing with `Config/Shotsy.storekit` also needs RevenueCat's StoreKit-tes
 | Cleanup categories | Real previews, one-by-one review | Batch marking for similar/duplicate/blurry/burst extras |
 | Screenshot Inbox | Browse, manual labels, pins, category corrections | Automatic categories + OCR text search |
 | Smart Collections | 1 saved | Unlimited |
-| People | Manual tagging (automatic grouping preview limited to 200 photos *when a model exists*) | Full automatic grouping *when a model exists* |
 | Video compression | Inspect source and options | Export compressed copies |
 
 Hitting the limit or losing Pro never blocks undo, corrections, reviewing or deleting already-queued items,
-deleting People data, or existing collections and names.
+or existing Smart Collections.
 
 ## Architecture
 
@@ -70,16 +69,17 @@ Shotsy/App            entry, AppModel (service container, deep links), Router
 Shotsy/Config         OwnerConfig, Policy
 Shotsy/DesignSystem   brand tokens (light/dark), fonts, buttons, softAppBar(), shared components
 Shotsy/Mascot         Canvas mascot + Lottie wrapper (brand kit assets)
-Shotsy/Core           Photos, Persistence, Review, Analysis, People, Video, SmartCollections, Memories, Purchases, System
-Shotsy/Features       Onboarding, Clean, Sort, Review, Screenshots, Memories, Library, People, Albums, Settings, Paywall
+Shotsy/Core           Photos, Persistence, Review, Analysis, Video, SmartCollections, Memories, Purchases, System
+Shotsy/Features       Onboarding, Clean, Sort, Review, Screenshots, Memories, Library, Albums, Settings, Paywall
 Shared/               deep links (reminder notifications)
 ShotsyTests/          Swift Testing suites
 brand/                original brand kit (SVG, Lottie, previews, generators)
 ```
 
-- **Persistence:** SwiftData `SchemaV1` with a `SchemaMigrationPlan`. Two stores: *Main* (decisions, sessions,
+- **Persistence:** SwiftData `SchemaV2` with `ShotsyMigrationPlan` (V1 → V2 is a lightweight stage that drops the
+  People entities; `SchemaV1` stays frozen so 1.0 stores migrate). Two stores: *Main* (decisions, sessions,
   quota log, screenshot corrections/labels/pins, Smart Collections, compression jobs) and *Derived* (feature prints,
-  sharpness, video sizes, OCR text, faces, people). The Derived folder is excluded from backup. Photos stays the
+  sharpness, video sizes, OCR text). The Derived folder is excluded from backup. Photos stays the
   source of truth: only asset identifiers are stored, never media.
 - **Review engine:** `ReviewLedger` (pure) handles keep/mark/skip, undo, shared daily quota, and session pruning;
   `ReviewStore` persists after every decision.
@@ -87,7 +87,7 @@ brand/                original brand kit (SVG, Lottie, previews, generators)
   `CustomerInfo` to Free / Weekly / Lifetime (lifetime wins; an active weekly alongside it is shown with
   Manage Subscription). RevenueCat handles receipt validation, grace periods, refunds and expiry; the SDK caches
   customer info for offline use.
-- **Concurrency:** UI on the main actor; analysis and face detection run in `@ModelActor` workers in batches, with
+- **Concurrency:** UI on the main actor; analysis runs in `@ModelActor` workers in batches, with
   cancellation between items and progress saved per batch.
 - **Soft app bar:** `View.softAppBar()` applies `.scrollEdgeEffectStyle(.soft, for: .top)` to every main scroll
   container (grids, lists, forms), with native `NavigationStack` toolbars and no extra material layer.
@@ -124,32 +124,9 @@ brand/                original brand kit (SVG, Lottie, previews, generators)
 - **Smart Collections:** ALL/ANY rules with three-valued logic (yes/no/unknown). Unknown values (not indexed,
   size unknown, album gone) are reported, never counted as matches. Incompatible ALL rules are blocked.
   "Save as Photos album" makes a one-time snapshot and says so.
-- **People:** see the dependency note below.
-  Handles no access, no data, stale (>3 days), and complete. Links: Quick 20, continue session.
 - **Reminders:** optional; permission is requested only when turned on. Weekday and time picker. Every change
   removes Shotsy's pending requests before scheduling, so nothing duplicates. Reconciled on time-zone changes.
   Text: "Ready for a quick photo sort?"
-
-## People: automatic grouping is an open dependency
-
-Vision (iOS 26.5 SDK, checked) detects faces and landmarks but has **no public face-identity embedding API**, and
-Shotsy doesn't use Apple Photos' People data. Automatic grouping needs a face-embedding model whose **code and
-weights** both allow commercial redistribution. None was bundled: common free models (FaceNet/ArcFace/InsightFace
-variants) carry weights trained on datasets with non-commercial or unclear terms, and verifying and converting one
-is engineering work this release didn't include.
-
-What ships and works:
-- On-device face detection (`DetectFaceRectanglesRequest` + capture quality), only after People is turned on.
-- Manual tagging: name a person, tag faces, **Merge groups**, **Split group**, **Not this person** (remembered
-  through rescans), **Add missing photo**, **Choose cover**, remove a person, **Delete People data**.
-- A complete grouping pipeline, ready for a model: `FaceEmbedder` protocol, `CoreMLFaceEmbedder` adapter, crop
-  normalization, and conservative `FaceGrouper` (centroid + majority check against chaining, respects rejections
-  and manual tags, leaves singletons ungrouped). It's unit-tested with synthetic vectors only. This is **not** a
-  measure of recognition quality.
-
-To enable automatic grouping later, add a validated `ShotsyFaceEmbedder.mlmodel` (one image input, one MultiArray
-output, preprocessing baked in) to the app target, tune `FaceGrouper`'s threshold on consented evaluation data, and
-record the model source, revision/hash, and license below. Until then the UI says automatic grouping isn't available.
 
 ## Costs and dependencies
 
@@ -159,7 +136,6 @@ record the model source, revision/hash, and license below. Until then the UI say
 | lottie-ios via `lottie-spm` 4.6.1 | On device | Free | Apache-2.0; SPM download at build time |
 | Unbounded, Onest fonts | Bundled | Free | SIL OFL 1.1 (`Shotsy/Resources/Fonts/OFL-*.txt`); static instances cut with fontTools |
 | Brand kit (SVG, Lottie JSON) | Bundled | Owner-supplied | |
-| Face-embedding model | — | — | **Not included** (see above) |
 | RevenueCat (`purchases-ios-spm` 5.91.0) | SDK on device + RevenueCat servers | Free up to USD 2.5k monthly tracked revenue, then a revenue share. Check RevenueCat's current pricing | MIT-licensed SDK. **The one hosted service, chosen by the owner** |
 | Own backend / storage / AI APIs | — | **None** | |
 | Apple Developer Program | — | USD 99/yr (varies by region) | An existing membership covers this app |
@@ -183,9 +159,9 @@ New strings: add them to `tools/translations/all_keys.json` and each `tr_<lang>.
 
 - `Shotsy/Resources/PrivacyInfo.xcprivacy`: no tracking. Collected data: purchase history (app functionality, not linked) for RevenueCat. Confirm against RevenueCat's App Privacy guide. Required-reason APIs declared:
   UserDefaults (CA92.1), disk space (E174.1, checked before video export). Lottie ships its own manifest.
-- Recognized text, face data and identifiers are never logged or sent anywhere. Derived data (OCR text, feature
-  prints, faces, names) is stored in `Application Support/Shotsy/Derived`, excluded from backup.
-- Settings: Clear analysis cache, Delete People data, and Reset review history never touch Photos.
+- Recognized text and identifiers are never logged or sent anywhere. Shotsy doesn't detect or store faces.
+  Derived data (OCR text, feature prints, sharpness) is stored in `Application Support/Shotsy/Derived`, excluded from backup.
+- Settings: Clear analysis cache and Reset review history never touch Photos.
 
 ## Verification
 
@@ -193,16 +169,17 @@ New strings: add them to `tools/translations/all_keys.json` and each `tr_<lang>.
 |---|---|
 | `xcodebuild build` (Debug, iOS 26.5 simulator), app + tests | ✅ Succeeds, **0 warnings** in project code |
 | `xcodebuild build` (Release, generic iOS Simulator) | ✅ Succeeds |
-| `xcodebuild test` | ✅ **64 tests in 13 suites pass** (Swift Testing) |
+| `xcodebuild test` | ✅ **107 tests in 23 suites pass** (Swift Testing) |
 | Manual run, iPhone 17 Pro Max simulator, iOS 26.5 | Onboarding, photo permission, Clean dashboard with live scan progress, Library grid, sort session (dark mode), Settings with the soft app-bar edge |
 
 Tests cover: swipe/undo persistence, shared quota and no double counting, duplicate queue membership, session
 pruning when assets disappear, deletion revalidation and cancellation keeping selections, Quick 20
 dedupe/quota/empty, On This Day (time zones, leap days, spans), Smart Collection ALL/ANY/unknown and validation,
 screenshot classification and correction precedence, similarity windowing and keeper rules, duplicate verification
-(Live Photo/RAW resources), blur metric, face grouping (rejections, manual tags, anti-chaining), entitlements
+(Live Photo/RAW resources), blur metric, entitlements
 (lifetime precedence, expiry, refunds), deep-link validation, reminder plans, compression
-policy, and month indexing.
+policy, month indexing, saved Smart Collection rules from 1.0 (unknown rules dropped), and the SwiftData
+V1 → V2 migration of a 1.0 store.
 
 **Performance, measured** (simulator on this Mac, Debug build): similarity grouping of 20,000 synthetic 768-d
 feature prints takes **0.12 s**; building Quick 20 plus the pending queue over 50,000 decisions takes **7 ms**.

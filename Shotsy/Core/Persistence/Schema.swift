@@ -4,10 +4,12 @@ import SwiftData
 // Two stores:
 //  • Main store (backed up with the device): review decisions, sessions, quota log, user corrections,
 //    smart collections, compression jobs.
-//  • Derived store (excluded from backup, rebuildable): analysis results, OCR text, face observations,
-//    people. Keeps sensitive derived data on this device, per the local-only promise.
+//  • Derived store (excluded from backup, rebuildable): analysis results, OCR text, index state.
+//    Keeps sensitive derived data on this device, per the local-only promise.
 // Photos stays the source of truth for media and album membership; only identifiers are stored.
 
+/// Shotsy 1.0 schema. Frozen: never edit these models; add a new version instead.
+/// It still contains `PersonRecord`/`FaceRecord` from the removed People feature so existing stores can migrate.
 enum SchemaV1: VersionedSchema {
     static var versionIdentifier: Schema.Version { Schema.Version(1, 0, 0) }
 
@@ -226,58 +228,272 @@ enum SchemaV1: VersionedSchema {
     }
 }
 
-enum ShotsyMigrationPlan: SchemaMigrationPlan {
-    static var schemas: [any VersionedSchema.Type] { [SchemaV1.self] }
-    /// Add a stage here for every new schema version. Derived models can be dropped and rebuilt,
-    /// but user corrections (ScreenshotMeta, FaceRecord manual assignments, PersonRecord names) must migrate.
-    static var stages: [MigrationStage] { [] }
+/// People (face tagging) removed: `PersonRecord` and `FaceRecord` are gone. Every other model is unchanged.
+enum SchemaV2: VersionedSchema {
+    static var versionIdentifier: Schema.Version { Schema.Version(2, 0, 0) }
+
+    static var models: [any PersistentModel.Type] {
+        mainModels + derivedModels
+    }
+
+    static var mainModels: [any PersistentModel.Type] {
+        [DecisionRecord.self, SessionRecord.self, DailyReviewRecord.self, ScreenshotMeta.self,
+         SmartCollectionRecord.self, CompressionJobRecord.self]
+    }
+
+    static var derivedModels: [any PersistentModel.Type] {
+        [AnalysisRecord.self, ScreenshotIndexRecord.self, IndexStateRecord.self]
+    }
+
+    // MARK: Main store
+
+    @Model final class DecisionRecord {
+        @Attribute(.unique) var assetID: String
+        var decisionRaw: String
+        var decidedAt: Date
+
+        init(assetID: String, decision: ReviewDecision, decidedAt: Date = .now) {
+            self.assetID = assetID
+            self.decisionRaw = decision.rawValue
+            self.decidedAt = decidedAt
+        }
+    }
+
+    @Model final class SessionRecord {
+        @Attribute(.unique) var id: UUID
+        var kindRaw: String
+        var title: String
+        /// JSON-encoded `SessionState` (frozen IDs, position, outcomes, undo history).
+        var stateData: Data
+        var monthKey: String?
+        var createdAt: Date
+        var updatedAt: Date
+        var completedAt: Date?
+
+        init(id: UUID = UUID(), kind: SessionKind, title: String, state: Data, monthKey: String?) {
+            self.id = id
+            self.kindRaw = kind.rawValue
+            self.title = title
+            self.stateData = state
+            self.monthKey = monthKey
+            self.createdAt = .now
+            self.updatedAt = .now
+        }
+    }
+
+    @Model final class DailyReviewRecord {
+        @Attribute(.unique) var dayKey: String
+        var assetIDs: [String]
+
+        init(dayKey: String, assetIDs: [String]) {
+            self.dayKey = dayKey
+            self.assetIDs = assetIDs
+        }
+    }
+
+    /// User-owned screenshot organization. Survives rescans and model updates.
+    @Model final class ScreenshotMeta {
+        @Attribute(.unique) var assetID: String
+        /// Explicit correction; wins over any suggestion.
+        var userCategoryRaw: String?
+        var labels: [String]
+        var isPinned: Bool
+        var updatedAt: Date
+
+        init(assetID: String) {
+            self.assetID = assetID
+            self.labels = []
+            self.isPinned = false
+            self.updatedAt = .now
+        }
+    }
+
+    @Model final class SmartCollectionRecord {
+        @Attribute(.unique) var id: UUID
+        var name: String
+        var matchAll: Bool
+        /// JSON-encoded `[SmartRule]`.
+        var rulesData: Data
+        var createdAt: Date
+        var sortIndex: Int
+
+        init(id: UUID = UUID(), name: String, matchAll: Bool, rulesData: Data, sortIndex: Int) {
+            self.id = id
+            self.name = name
+            self.matchAll = matchAll
+            self.rulesData = rulesData
+            self.createdAt = .now
+            self.sortIndex = sortIndex
+        }
+    }
+
+    /// Persistent job record so an interrupted export never imports twice.
+    @Model final class CompressionJobRecord {
+        @Attribute(.unique) var id: UUID
+        var sourceAssetID: String
+        var presetRaw: String
+        var stateRaw: String
+        var tempFileName: String?
+        var outputAssetID: String?
+        var sourceBytes: Int64?
+        var outputBytes: Int64?
+        var errorMessage: String?
+        var createdAt: Date
+        var updatedAt: Date
+
+        init(id: UUID = UUID(), sourceAssetID: String, presetRaw: String, stateRaw: String) {
+            self.id = id
+            self.sourceAssetID = sourceAssetID
+            self.presetRaw = presetRaw
+            self.stateRaw = stateRaw
+            self.createdAt = .now
+            self.updatedAt = .now
+        }
+    }
+
+    // MARK: Derived store
+
+    @Model final class AnalysisRecord {
+        @Attribute(.unique) var assetID: String
+        var version: Int
+        /// Archived `VNFeaturePrintObservation` for similarity.
+        var featurePrint: Data?
+        /// Variance of the Laplacian on a 512 px grayscale thumbnail. Higher = sharper.
+        var sharpness: Double?
+        /// Measured local file size for videos, if known without downloading.
+        var videoBytes: Int64?
+        var assetModifiedAt: Date?
+        var analyzedAt: Date
+        /// Thumbnail wasn't available locally (cloud-only, not downloaded).
+        var unavailable: Bool
+
+        init(assetID: String, version: Int) {
+            self.assetID = assetID
+            self.version = version
+            self.analyzedAt = .now
+            self.unavailable = false
+        }
+    }
+
+    @Model final class ScreenshotIndexRecord {
+        @Attribute(.unique) var assetID: String
+        var ocrVersion: Int
+        /// Recognized text. Private: never logged or sent anywhere.
+        var text: String
+        var links: [String]
+        var suggestedCategoryRaw: String?
+        var confidence: Double
+        var failed: Bool
+        var assetModifiedAt: Date?
+
+        init(assetID: String, ocrVersion: Int) {
+            self.assetID = assetID
+            self.ocrVersion = ocrVersion
+            self.text = ""
+            self.links = []
+            self.confidence = 0
+            self.failed = false
+        }
+    }
+
+    @Model final class IndexStateRecord {
+        @Attribute(.unique) var key: String
+        var version: Int
+        var lastRun: Date?
+
+        init(key: String, version: Int) {
+            self.key = key
+            self.version = version
+        }
+    }
 }
 
-typealias DecisionRecord = SchemaV1.DecisionRecord
-typealias SessionRecord = SchemaV1.SessionRecord
-typealias DailyReviewRecord = SchemaV1.DailyReviewRecord
-typealias ScreenshotMeta = SchemaV1.ScreenshotMeta
-typealias SmartCollectionRecord = SchemaV1.SmartCollectionRecord
-typealias CompressionJobRecord = SchemaV1.CompressionJobRecord
-typealias AnalysisRecord = SchemaV1.AnalysisRecord
-typealias ScreenshotIndexRecord = SchemaV1.ScreenshotIndexRecord
-typealias PersonRecord = SchemaV1.PersonRecord
-typealias FaceRecord = SchemaV1.FaceRecord
-typealias IndexStateRecord = SchemaV1.IndexStateRecord
+enum ShotsyMigrationPlan: SchemaMigrationPlan {
+    static var schemas: [any VersionedSchema.Type] { [SchemaV1.self, SchemaV2.self] }
+    /// Add a stage here for every new schema version. Derived models can be dropped and rebuilt,
+    /// but user corrections (ScreenshotMeta, labels, pins, Smart Collections) must migrate.
+    static var stages: [MigrationStage] { [v1ToV2] }
+
+    /// V1 → V2 drops the People entities (`PersonRecord`, `FaceRecord`), which lived only in the derived store.
+    /// Removing entities is a lightweight change; the main store's models are identical in both versions.
+    static let v1ToV2 = MigrationStage.lightweight(fromVersion: SchemaV1.self, toVersion: SchemaV2.self)
+}
+
+typealias DecisionRecord = SchemaV2.DecisionRecord
+typealias SessionRecord = SchemaV2.SessionRecord
+typealias DailyReviewRecord = SchemaV2.DailyReviewRecord
+typealias ScreenshotMeta = SchemaV2.ScreenshotMeta
+typealias SmartCollectionRecord = SchemaV2.SmartCollectionRecord
+typealias CompressionJobRecord = SchemaV2.CompressionJobRecord
+typealias AnalysisRecord = SchemaV2.AnalysisRecord
+typealias ScreenshotIndexRecord = SchemaV2.ScreenshotIndexRecord
+typealias IndexStateRecord = SchemaV2.IndexStateRecord
 
 nonisolated enum PersistenceController {
     /// Bump when analysis output changes; stale records are recomputed, user corrections are kept.
     static let analysisVersion = 1
     static let ocrVersion = 1
-    static let faceDetectorVersion = 1
 
-    static func makeContainer(inMemory: Bool = false) throws -> ModelContainer {
-        let schema = Schema(versionedSchema: SchemaV1.self)
-        let main: ModelConfiguration
-        let derived: ModelConfiguration
-        if inMemory {
-            main = ModelConfiguration("Main", schema: Schema(SchemaV1.mainModels), isStoredInMemoryOnly: true)
-            derived = ModelConfiguration("Derived", schema: Schema(SchemaV1.derivedModels), isStoredInMemoryOnly: true)
-        } else {
-            let dir = try storeDirectory()
-            main = ModelConfiguration("Main", schema: Schema(SchemaV1.mainModels), url: dir.appendingPathComponent("Main.store"))
-            let derivedDir = try derivedDirectory()
-            derived = ModelConfiguration("Derived", schema: Schema(SchemaV1.derivedModels),
-                                         url: derivedDir.appendingPathComponent("Derived.store"))
+    static func makeContainer(inMemory: Bool = false, directory: URL? = nil) throws -> ModelContainer {
+        let schema = Schema(versionedSchema: SchemaV2.self)
+        func open() throws -> ModelContainer {
+            let configurations = try self.configurations(main: SchemaV2.mainModels, derived: SchemaV2.derivedModels,
+                                                         inMemory: inMemory, directory: directory)
+            return try ModelContainer(for: schema, migrationPlan: ShotsyMigrationPlan.self, configurations: configurations)
         }
-        return try ModelContainer(for: schema, migrationPlan: ShotsyMigrationPlan.self,
-                                  configurations: [main, derived])
+        let container: ModelContainer
+        do {
+            container = try open()
+        } catch {
+            guard !inMemory else { throw error }
+            // Safety net: the derived store is a rebuildable cache (excluded from backup). If it can't be opened or
+            // migrated (the V1 → V2 stage is expected to succeed; see MigrationTests), delete it and start a fresh
+            // cache that the next scan rebuilds. The main store (user decisions and corrections) is never deleted.
+            try removeDerivedStore(directory: directory)
+            container = try open()
+        }
+        removeLegacyIndexState(in: container)
+        return container
     }
 
-    static func storeDirectory() throws -> URL {
-        let url = URL.applicationSupportDirectory.appendingPathComponent("Shotsy", isDirectory: true)
+    /// Store layout shared by the app and the migration tests.
+    static func configurations(main: [any PersistentModel.Type], derived: [any PersistentModel.Type],
+                               inMemory: Bool = false, directory: URL? = nil) throws -> [ModelConfiguration] {
+        if inMemory {
+            return [ModelConfiguration("Main", schema: Schema(main), isStoredInMemoryOnly: true),
+                    ModelConfiguration("Derived", schema: Schema(derived), isStoredInMemoryOnly: true)]
+        }
+        let dir = try storeDirectory(base: directory)
+        let derivedDir = try derivedDirectory(base: directory)
+        return [ModelConfiguration("Main", schema: Schema(main), url: dir.appendingPathComponent("Main.store")),
+                ModelConfiguration("Derived", schema: Schema(derived), url: derivedDir.appendingPathComponent("Derived.store"))]
+    }
+
+    /// 1.0 builds remembered photos with no faces as "faces.none.<id>" rows. Nothing reads them anymore.
+    /// One batch delete; it finds nothing after the first launch.
+    private static func removeLegacyIndexState(in container: ModelContainer) {
+        let context = ModelContext(container)
+        try? context.delete(model: IndexStateRecord.self, where: #Predicate { $0.key.starts(with: "faces.") })
+        try? context.save()
+    }
+
+    private static func removeDerivedStore(directory: URL?) throws {
+        let store = try derivedDirectory(base: directory).appendingPathComponent("Derived.store")
+        for suffix in ["", "-wal", "-shm"] {
+            let url = URL(fileURLWithPath: store.path + suffix)
+            if FileManager.default.fileExists(atPath: url.path) { try FileManager.default.removeItem(at: url) }
+        }
+    }
+
+    static func storeDirectory(base: URL? = nil) throws -> URL {
+        let url = (base ?? URL.applicationSupportDirectory).appendingPathComponent("Shotsy", isDirectory: true)
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
         return url
     }
 
     /// Derived data lives in its own folder, excluded from iCloud/device backups.
-    static func derivedDirectory() throws -> URL {
-        var url = try storeDirectory().appendingPathComponent("Derived", isDirectory: true)
+    static func derivedDirectory(base: URL? = nil) throws -> URL {
+        var url = try storeDirectory(base: base).appendingPathComponent("Derived", isDirectory: true)
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
         var values = URLResourceValues()
         values.isExcludedFromBackup = true

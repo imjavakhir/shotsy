@@ -71,7 +71,6 @@ struct PaywallView: View {
         case .batchCleanup: "Clean up in one tap"
         case .ocrSearch, .categorySuggestions: "Find any screenshot"
         case .smartCollections: "Make all the collections"
-        case .people: "Your whole library, sorted"
         case .compression: "Shrink big videos"
         case .settings: "Meet Shotsy Pro"
         }

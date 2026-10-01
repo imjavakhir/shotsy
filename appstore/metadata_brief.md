@@ -1,7 +1,7 @@
 # Shotsy App Store metadata — localization brief
 
 Source: /Users/javoxir/Documents/NEW CHAPTER/shotsy/appstore/metadata/en-US.json (read it first).
-App: Shotsy — iPhone photo organizer/cleaner (swipe to keep or delete, similar/duplicate/blurry finder, screenshot inbox with text search, video compression, albums, smart collections, On This Day, people tagging). Everything runs on device. Brand: friendly mascot, short and warm tone.
+App: Shotsy — iPhone photo organizer/cleaner (swipe to keep or delete, similar/duplicate/blurry finder, screenshot inbox with text search, video compression, albums, smart collections, On This Day). Everything runs on device. Brand: friendly mascot, short and warm tone.
 
 For each locale you're given, write /Users/javoxir/Documents/NEW CHAPTER/shotsy/appstore/metadata/<locale>.json with the SAME structure as en-US.json:
 - name (≤30 chars): keep "Shotsy" + a localized, searchable descriptor, e.g. "Shotsy - <photo cleaner/organizer phrase>". Use the phrase people in that market actually search.

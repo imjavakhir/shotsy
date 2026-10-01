@@ -33,7 +33,6 @@ final class SettingsStore {
     var protectFavorites: Bool { didSet { defaults.set(protectFavorites, forKey: "protectFavorites") } }
     var ocrEnabled: Bool { didSet { defaults.set(ocrEnabled, forKey: "ocr") } }
     var categoryAnalysisEnabled: Bool { didSet { defaults.set(categoryAnalysisEnabled, forKey: "categoryAnalysis") } }
-    var peopleEnabled: Bool { didSet { defaults.set(peopleEnabled, forKey: "people") } }
     var onThisDayEnabled: Bool { didSet { defaults.set(onThisDayEnabled, forKey: "onThisDay") } }
     /// Scan new and edited photos automatically. Off: scans run only from "Scan Now".
     var autoScanEnabled: Bool { didSet { defaults.set(autoScanEnabled, forKey: "autoScan") } }
@@ -60,7 +59,8 @@ final class SettingsStore {
         protectFavorites = defaults.bool(forKey: "protectFavorites")
         ocrEnabled = defaults.bool(forKey: "ocr")
         categoryAnalysisEnabled = defaults.bool(forKey: "categoryAnalysis")
-        peopleEnabled = defaults.bool(forKey: "people")
+        // Leftover toggle from the removed face-tagging feature (1.0 builds).
+        defaults.removeObject(forKey: "people")
         onThisDayEnabled = defaults.bool(forKey: "onThisDay")
         autoScanEnabled = defaults.bool(forKey: "autoScan")
         pauseOnLowPower = defaults.bool(forKey: "pauseOnLowPower")
