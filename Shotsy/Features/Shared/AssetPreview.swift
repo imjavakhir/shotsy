@@ -36,7 +36,9 @@ struct AssetPreviewView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        // No NavigationStack: a navigation bar reserves the status-bar band, and media should fill the
+        // whole screen. Close and the date float in Liquid Glass like the bottom actions.
+        ZStack {
             TabView(selection: $current) {
                 ForEach(window, id: \.self) { id in
                     PreviewPage(assetID: id, onTap: toggleChrome) { playing in
@@ -61,31 +63,24 @@ struct AssetPreviewView: View {
             }
             .overlay(alignment: .bottom) {
                 if !hidesChrome {
-                    actionBar.transition(.opacity)
-                }
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbar(hidesChrome ? .hidden : .visible, for: .navigationBar)
-            .statusBarHidden(hidesChrome)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Close", systemImage: "xmark") { dismiss() }
-                }
-                ToolbarItem(placement: .principal) {
-                    if let asset = library.asset(for: current), let date = asset.creationDate {
-                        VStack(spacing: 0) {
-                            Text(date.formatted(date: .abbreviated, time: .omitted)).font(.appSubheadline.weight(.semibold))
-                            Text(date.formatted(date: .omitted, time: .shortened)).font(.appCaption)
-                        }
-                        .foregroundStyle(.white)
-                    }
+                    PreviewActionBar(assetID: current, preparingShare: preparingShare, onShare: share,
+                                     onAlbum: { showAlbumSheet = true }, onInfo: { showInfo = true },
+                                     onLimit: { showLimit = true }, flash: flash)
+                        .transition(.opacity)
                 }
             }
             .overlay(alignment: .top) {
+                if !hidesChrome {
+                    PreviewTopBar(assetID: current) { dismiss() }
+                        .transition(.opacity)
+                }
+            }
+            .statusBarHidden(hidesChrome)
+            .overlay(alignment: .top) {
                 if let message {
                     Notice(kind: .info, text: LocalizedStringKey(message))
-                        .padding()
+                        .padding(.horizontal)
+                        .padding(.top, 64) // below the floating close button and date
                         .transition(.move(edge: .top).combined(with: .opacity))
                 }
             }
@@ -137,12 +132,96 @@ struct AssetPreviewView: View {
         if next != window { window = next }
     }
 
-    /// Our own action row: one clear icon per action, floating over the photo in Liquid Glass.
-    private var actionBar: some View {
-        let asset = library.asset(for: current)
+    private func share(_ asset: PHAsset) {
+        Task {
+            preparingShare = true
+            shareURLs = await ShareExporter.files(for: [asset])
+            preparingShare = false
+            if shareURLs.isEmpty {
+                flash(String(localized: "Couldn't prepare this item. It may be in iCloud while you're offline."))
+            } else {
+                showShare = true
+            }
+        }
+    }
+
+    private func flash(_ text: String) {
+        withAnimation { message = text }
+        Task {
+            try? await Task.sleep(for: .seconds(2.5))
+            withAnimation { message = nil }
+        }
+    }
+}
+
+/// Date and time of the current item. Separate so library changes re-render only this, not the pager.
+private struct PreviewTitle: View {
+    let assetID: String
+    @Environment(PhotoLibrary.self) private var library
+
+    var body: some View {
+        if let date = library.asset(for: assetID)?.creationDate {
+            VStack(spacing: 0) {
+                Text(date.formatted(date: .abbreviated, time: .omitted)).font(.appSubheadline.weight(.semibold))
+                Text(date.formatted(date: .omitted, time: .shortened)).font(.appCaption)
+            }
+            .foregroundStyle(.white)
+            .padding(.horizontal, Space.m)
+            .frame(height: 52)
+            .glassEffect(.regular.tint(.black.opacity(0.35)), in: .capsule)
+            .environment(\.colorScheme, .dark)
+            .accessibilityElement(children: .combine)
+        }
+    }
+}
+
+/// Close button and date, floating over the photo in Liquid Glass.
+private struct PreviewTopBar: View {
+    let assetID: String
+    let onClose: () -> Void
+
+    var body: some View {
+        GlassEffectContainer(spacing: Space.s) {
+            ZStack {
+                PreviewTitle(assetID: assetID)
+                HStack {
+                    Button(action: onClose) {
+                        Image(systemName: "xmark")
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(.white)
+                            .frame(width: 52, height: 52)
+                            .glassEffect(.regular.tint(.black.opacity(0.35)).interactive(), in: .circle)
+                            .environment(\.colorScheme, .dark)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Close")
+                    Spacer()
+                }
+            }
+        }
+        .padding(.horizontal, Space.page)
+        .padding(.top, Space.xxs)
+    }
+}
+
+/// Our own action row: one clear icon per action, floating over the photo in Liquid Glass. It observes
+/// favorites and review decisions itself, so toggling one re-renders only this row.
+private struct PreviewActionBar: View {
+    let assetID: String
+    let preparingShare: Bool
+    let onShare: (PHAsset) -> Void
+    let onAlbum: () -> Void
+    let onInfo: () -> Void
+    let onLimit: () -> Void
+    let flash: (String) -> Void
+    @Environment(PhotoLibrary.self) private var library
+    @Environment(ReviewStore.self) private var reviews
+
+    var body: some View {
+        let asset = library.asset(for: assetID)
         let favorite = asset.map(library.isFavorite) ?? false
-        let marked = reviews.decision(for: current) == .marked
-        return GlassEffectContainer(spacing: Space.s) {
+        let marked = reviews.decision(for: assetID) == .marked
+        GlassEffectContainer(spacing: Space.s) {
           HStack {
             actionButton(favorite ? "Unfavorite" : "Favorite", favorite ? "heart.fill" : "heart",
                          tint: favorite ? Brand.blush : .white) {
@@ -152,33 +231,24 @@ struct AssetPreviewView: View {
             Spacer()
             actionButton("Share", "square.and.arrow.up", busy: preparingShare) {
                 guard let asset else { return }
-                Task {
-                    preparingShare = true
-                    shareURLs = await ShareExporter.files(for: [asset])
-                    preparingShare = false
-                    if shareURLs.isEmpty {
-                        flash(String(localized: "Couldn't prepare this item. It may be in iCloud while you're offline."))
-                    } else {
-                        showShare = true
-                    }
-                }
+                onShare(asset)
             }
             Spacer()
-            actionButton("Add to Album", "rectangle.stack.badge.plus") { showAlbumSheet = true }
+            actionButton("Add to Album", "rectangle.stack.badge.plus", action: onAlbum)
             Spacer()
-            actionButton("Info", "info.circle") { showInfo = true }
+            actionButton("Info", "info.circle", action: onInfo)
             Spacer()
             actionButton(marked ? "Unmark" : "Mark for deletion", marked ? "trash.slash" : "trash",
                          tint: marked ? Color.appDanger : .white) {
                 if marked {
-                    reviews.unmark([current])
+                    reviews.unmark([assetID])
                     flash(String(localized: "Removed from the deletion queue"))
                 } else {
                     do {
-                        try reviews.decide(.marked, ids: [current])
+                        try reviews.decide(.marked, ids: [assetID])
                         flash(String(localized: "Marked for deletion. Nothing is deleted until you review."))
                     } catch {
-                        showLimit = true
+                        onLimit()
                     }
                 }
             }
@@ -206,14 +276,6 @@ struct AssetPreviewView: View {
         .disabled(busy)
         .accessibilityLabel(label)
     }
-
-    private func flash(_ text: String) {
-        withAnimation { message = text }
-        Task {
-            try? await Task.sleep(for: .seconds(2.5))
-            withAnimation { message = nil }
-        }
-    }
 }
 
 private struct PreviewPage: View {
@@ -223,19 +285,38 @@ private struct PreviewPage: View {
     /// A video page started or stopped playing.
     let onPlaying: (Bool) -> Void
     @Environment(PhotoLibrary.self) private var library
+    /// Resolved once per page (and again only if it disappears from the library), not on every render.
+    @State private var asset: PHAsset?
+    @State private var resolved = false
 
     var body: some View {
-        if let asset = library.asset(for: assetID) {
-            switch asset.mediaType {
-            case .video: VideoPage(asset: asset, onPlaying: onPlaying)
-            default:
-                if asset.isLivePhoto { LivePhotoPage(asset: asset, onTap: onTap) } else { PhotoPage(asset: asset, onTap: onTap) }
+        Group {
+            if let asset {
+                switch asset.mediaType {
+                case .video: VideoPage(asset: asset, onPlaying: onPlaying)
+                default:
+                    if asset.isLivePhoto { LivePhotoPage(asset: asset, onTap: onTap) } else { PhotoPage(asset: asset, onTap: onTap) }
+                }
+            } else if resolved {
+                ContentUnavailableView("Not available", systemImage: "photo.badge.exclamationmark",
+                                       description: Text("This item was deleted or Shotsy can no longer access it."))
+                    .foregroundStyle(.white)
+            } else {
+                Color.clear
             }
-        } else {
-            ContentUnavailableView("Not available", systemImage: "photo.badge.exclamationmark",
-                                   description: Text("This item was deleted or Shotsy can no longer access it."))
-                .foregroundStyle(.white)
         }
+        .contentShape(Rectangle())
+        .onAppear(perform: resolve)
+        .onChange(of: library.changeCount) {
+            // Only the item's existence matters here; favorites and decisions are shown by the action bar.
+            let exists = library.asset(for: assetID) != nil
+            if exists != (asset != nil) { resolve() }
+        }
+    }
+
+    private func resolve() {
+        asset = library.asset(for: assetID)
+        resolved = true
     }
 }
 
@@ -262,6 +343,9 @@ private struct PhotoPage: View {
             }
         }
         .ignoresSafeArea()
+        .contentShape(Rectangle())
+        // Before the zoomable image exists, a plain tap still toggles the chrome.
+        .onTapGesture { if image == nil { onTap() } }
         .task(id: asset.localIdentifier) { await load() }
     }
 
@@ -334,7 +418,7 @@ struct ZoomableImage: UIViewRepresentable {
     }
 
     func updateUIView(_ scroll: UIScrollView, context: Context) {
-        context.coordinator.imageView?.image = image
+        if context.coordinator.imageView?.image !== image { context.coordinator.imageView?.image = image }
         context.coordinator.onTap = onTap
     }
 
@@ -362,7 +446,7 @@ private struct LivePhotoPage: View {
         ZStack {
             if let livePhoto {
                 // Touch and hold plays; a tap toggles the chrome.
-                LivePhotoView(livePhoto: livePhoto).onTapGesture(perform: onTap)
+                LivePhotoView(livePhoto: livePhoto, onTap: onTap)
             } else {
                 PhotoPage(asset: asset, onTap: onTap)
             }
@@ -392,15 +476,28 @@ private struct LivePhotoPage: View {
 /// Native Live Photo view: touch and hold to play.
 struct LivePhotoView: UIViewRepresentable {
     let livePhoto: PHLivePhoto
+    /// Single tap. A UIKit recognizer, so it doesn't compete with the view's own press-and-hold playback.
+    var onTap: (() -> Void)?
 
     func makeUIView(context: Context) -> PHLivePhotoView {
         let view = PHLivePhotoView()
         view.contentMode = .scaleAspectFit
+        let tap = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.tap))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
         return view
     }
 
     func updateUIView(_ view: PHLivePhotoView, context: Context) {
-        view.livePhoto = livePhoto
+        if view.livePhoto !== livePhoto { view.livePhoto = livePhoto }
+        context.coordinator.onTap = onTap
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
+    final class Coordinator: NSObject {
+        var onTap: (() -> Void)?
+        @objc func tap() { onTap?() }
     }
 }
 
