@@ -156,6 +156,8 @@ struct AssetPreviewView: View {
 
 /// Date and time of the current item. Separate so library changes re-render only this, not the pager.
 private struct PreviewTitle: View {
+    /// Same height as the system's glass toolbar buttons on the other screens.
+    static let barHeight: CGFloat = 44
     let assetID: String
     @Environment(PhotoLibrary.self) private var library
 
@@ -167,9 +169,12 @@ private struct PreviewTitle: View {
             }
             .foregroundStyle(.white)
             .padding(.horizontal, Space.m)
-            .frame(height: 52)
+            .frame(height: Self.barHeight)
             .glassEffect(.regular.tint(.black.opacity(0.35)), in: .capsule)
             .environment(\.colorScheme, .dark)
+            // Swallow taps on the bubble so they don't fall through to the photo (zoom / hide chrome).
+            .contentShape(.capsule)
+            .onTapGesture {}
             .accessibilityElement(children: .combine)
         }
     }
@@ -187,9 +192,9 @@ private struct PreviewTopBar: View {
                 HStack {
                     Button(action: onClose) {
                         Image(systemName: "xmark")
-                            .font(.title3.weight(.semibold))
+                            .font(.body.weight(.semibold))
                             .foregroundStyle(.white)
-                            .frame(width: 52, height: 52)
+                            .frame(width: PreviewTitle.barHeight, height: PreviewTitle.barHeight)
                             .glassEffect(.regular.tint(.black.opacity(0.35)).interactive(), in: .circle)
                             .environment(\.colorScheme, .dark)
                     }
@@ -200,7 +205,7 @@ private struct PreviewTopBar: View {
             }
         }
         .padding(.horizontal, Space.page)
-        .padding(.top, Space.xxs)
+        .padding(.top, 5)
     }
 }
 
@@ -408,9 +413,11 @@ struct ZoomableImage: UIViewRepresentable {
         scroll.backgroundColor = .clear
         let tap = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.doubleTap(_:)))
         tap.numberOfTapsRequired = 2
+        tap.delegate = context.coordinator
         scroll.addGestureRecognizer(tap)
         let single = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.singleTap(_:)))
         single.require(toFail: tap)
+        single.delegate = context.coordinator
         scroll.addGestureRecognizer(single)
         context.coordinator.imageView = view
         context.coordinator.onTap = onTap
@@ -424,13 +431,28 @@ struct ZoomableImage: UIViewRepresentable {
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
-    final class Coordinator: NSObject, UIScrollViewDelegate {
+    final class Coordinator: NSObject, UIScrollViewDelegate, UIGestureRecognizerDelegate {
         weak var imageView: UIImageView?
         var onTap: (() -> Void)?
         func viewForZooming(in scrollView: UIScrollView) -> UIView? { imageView }
+
+        /// Only touches that land on the photo itself. Taps on the floating buttons (SwiftUI views layered
+        /// above) must not also zoom the photo or toggle the chrome.
+        func gestureRecognizer(_ g: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+            PreviewTouch.isOn(g.view, touch)
+        }
+        /// Like Photos: zoom in on the spot that was tapped, or back out to fit.
         @objc func doubleTap(_ g: UITapGestureRecognizer) {
-            guard let scroll = g.view as? UIScrollView else { return }
-            scroll.setZoomScale(scroll.zoomScale > 1 ? 1 : 2.5, animated: true)
+            guard let scroll = g.view as? UIScrollView, let imageView else { return }
+            if scroll.zoomScale > scroll.minimumZoomScale {
+                scroll.setZoomScale(scroll.minimumZoomScale, animated: true)
+                return
+            }
+            let scale: CGFloat = 2.5
+            let point = g.location(in: imageView)
+            let size = CGSize(width: scroll.bounds.width / scale, height: scroll.bounds.height / scale)
+            scroll.zoom(to: CGRect(x: point.x - size.width / 2, y: point.y - size.height / 2,
+                                   width: size.width, height: size.height), animated: true)
         }
         @objc func singleTap(_ g: UITapGestureRecognizer) { onTap?() }
     }
@@ -484,6 +506,7 @@ struct LivePhotoView: UIViewRepresentable {
         view.contentMode = .scaleAspectFit
         let tap = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.tap))
         tap.cancelsTouchesInView = false
+        tap.delegate = context.coordinator
         view.addGestureRecognizer(tap)
         return view
     }
@@ -495,9 +518,20 @@ struct LivePhotoView: UIViewRepresentable {
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
-    final class Coordinator: NSObject {
+    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
         var onTap: (() -> Void)?
         @objc func tap() { onTap?() }
+        func gestureRecognizer(_ g: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+            PreviewTouch.isOn(g.view, touch)
+        }
+    }
+}
+
+/// Whether a touch really landed on a page's UIKit view rather than on SwiftUI controls drawn above it.
+private enum PreviewTouch {
+    static func isOn(_ view: UIView?, _ touch: UITouch) -> Bool {
+        guard let view, let hit = touch.view else { return false }
+        return hit === view || hit.isDescendant(of: view)
     }
 }
 
