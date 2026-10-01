@@ -14,6 +14,8 @@ struct AssetPreviewView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOver
+    /// The app's appearance, restored for sheets: the preview itself is always dark.
+    @Environment(\.colorScheme) private var outerScheme
     @State private var current: String
     @State private var window: [String] = []
     @State private var showAlbumSheet = false
@@ -36,18 +38,25 @@ struct AssetPreviewView: View {
     }
 
     var body: some View {
-        // No NavigationStack: a navigation bar reserves the status-bar band, and media should fill the
-        // whole screen. Close and the date float in Liquid Glass like the bottom actions.
-        ZStack {
-            TabView(selection: $current) {
-                ForEach(window, id: \.self) { id in
-                    PreviewPage(assetID: id, onTap: toggleChrome) { playing in
-                        if playing { playingID = id } else if playingID == id { playingID = nil }
+        // System navigation bar and bottom toolbar with transparent backgrounds: UIKit owns the controls, so
+        // every tap lands on the first try, while the pager ignores the safe area and fills the whole screen.
+        NavigationStack {
+            // A paging ScrollView rather than a page-style TabView: inside a NavigationStack the TabView
+            // offsets its pages below the top edge even when ignoring the safe area.
+            ScrollView(.horizontal) {
+                LazyHStack(spacing: 0) {
+                    ForEach(window, id: \.self) { id in
+                        PreviewPage(assetID: id, onTap: toggleChrome) { playing in
+                            if playing { playingID = id } else if playingID == id { playingID = nil }
+                        }
+                        .containerRelativeFrame([.horizontal, .vertical])
                     }
-                    .tag(id)
                 }
+                .scrollTargetLayout()
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
+            .scrollTargetBehavior(.paging)
+            .scrollIndicators(.hidden)
+            .scrollPosition(id: Binding(get: { current }, set: { if let id = $0 { current = id } }))
             .ignoresSafeArea()
             .background(Color.black.ignoresSafeArea())
             .overlay(alignment: .top) {
@@ -61,26 +70,23 @@ struct AssetPreviewView: View {
                         .transition(.opacity)
                 }
             }
-            .overlay(alignment: .bottom) {
-                if !hidesChrome {
-                    PreviewActionBar(assetID: current, preparingShare: preparingShare, onShare: share,
-                                     onAlbum: { showAlbumSheet = true }, onInfo: { showInfo = true },
-                                     onLimit: { showLimit = true }, flash: flash)
-                        .transition(.opacity)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close", systemImage: "xmark") { dismiss() }
                 }
+                ToolbarItem(placement: .principal) { PreviewTitle(assetID: current) }
+                bottomBar
             }
-            .overlay(alignment: .top) {
-                if !hidesChrome {
-                    PreviewTopBar(assetID: current) { dismiss() }
-                        .transition(.opacity)
-                }
-            }
+            // Transparent bars over the photo; dark styling keeps the glass controls legible.
+            .toolbarBackground(.hidden, for: .navigationBar, .bottomBar)
+            .toolbar(hidesChrome ? .hidden : .visible, for: .navigationBar, .bottomBar)
             .statusBarHidden(hidesChrome)
             .overlay(alignment: .top) {
                 if let message {
                     Notice(kind: .info, text: LocalizedStringKey(message))
                         .padding(.horizontal)
-                        .padding(.top, 64) // below the floating close button and date
+                        .padding(.top, 8)
                         .transition(.move(edge: .top).combined(with: .opacity))
                 }
             }
@@ -91,6 +97,8 @@ struct AssetPreviewView: View {
             .onAppear { recenter() }
             .sheet(isPresented: $showAlbumSheet) {
                 AddToAlbumSheet(assetIDs: [current]) { title in flash(String(localized: "Added to \(title)")) }
+                    .environment(\.colorScheme, outerScheme)
+                    .tint(Color.appAccent)
             }
             .sheet(isPresented: $showShare) {
                 ActivityView(items: shareURLs).presentationDetents([.medium, .large])
@@ -105,12 +113,42 @@ struct AssetPreviewView: View {
                     limitAfterInfo = true
                     showInfo = false
                 }
+                .environment(\.colorScheme, outerScheme)
+                .tint(Color.appAccent)
             }
             .sheet(isPresented: $showLimit) {
                 // Shown here because the app-level paywall sheet sits behind this full-screen preview.
                 LimitSheet { dismiss() }
+                    .environment(\.colorScheme, outerScheme)
+                    .tint(Color.appAccent)
             }
         }
+        // No app tint on the bars: Liquid Glass picks a legible symbol color over the photo, like Photos.
+        .tint(nil)
+    }
+
+    /// The action row, as system bottom-bar items (each its own glass control).
+    @ToolbarContentBuilder private var bottomBar: some ToolbarContent {
+            ToolbarItem(placement: .bottomBar) { FavoriteToolbarButton(assetID: current) }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItem(placement: .bottomBar) {
+                Button("Share", systemImage: "square.and.arrow.up") {
+                    if let asset = library.asset(for: current) { share(asset) }
+                }
+                .disabled(preparingShare)
+            }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItem(placement: .bottomBar) {
+                Button("Add to Album", systemImage: "rectangle.stack.badge.plus") { showAlbumSheet = true }
+            }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItem(placement: .bottomBar) {
+                Button("Info", systemImage: "info.circle") { showInfo = true }
+            }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItem(placement: .bottomBar) {
+                MarkToolbarButton(assetID: current, onLimit: { showLimit = true }, flash: flash)
+            }
     }
 
     /// Chrome steps aside when the user hides it or the current video is playing. With VoiceOver on it stays,
@@ -156,8 +194,6 @@ struct AssetPreviewView: View {
 
 /// Date and time of the current item. Separate so library changes re-render only this, not the pager.
 private struct PreviewTitle: View {
-    /// Same height as the system's glass toolbar buttons on the other screens.
-    static let barHeight: CGFloat = 44
     let assetID: String
     @Environment(PhotoLibrary.self) private var library
 
@@ -168,118 +204,53 @@ private struct PreviewTitle: View {
                 Text(date.formatted(date: .omitted, time: .shortened)).font(.appCaption)
             }
             .foregroundStyle(.white)
-            .padding(.horizontal, Space.m)
-            .frame(height: Self.barHeight)
-            .glassEffect(.regular.tint(.black.opacity(0.35)), in: .capsule)
-            .environment(\.colorScheme, .dark)
-            // Swallow taps on the bubble so they don't fall through to the photo (zoom / hide chrome).
-            .contentShape(.capsule)
-            .onTapGesture {}
+            .shadow(color: .black.opacity(0.4), radius: 3)
             .accessibilityElement(children: .combine)
         }
     }
 }
 
-/// Close button and date, floating over the photo in Liquid Glass.
-private struct PreviewTopBar: View {
+/// Favorite toggle. Observes favorites itself, so toggling re-renders only this button.
+private struct FavoriteToolbarButton: View {
     let assetID: String
-    let onClose: () -> Void
-
-    var body: some View {
-        GlassEffectContainer(spacing: Space.s) {
-            ZStack {
-                PreviewTitle(assetID: assetID)
-                HStack {
-                    Button(action: onClose) {
-                        Image(systemName: "xmark")
-                            .font(.body.weight(.semibold))
-                            .foregroundStyle(.white)
-                            .frame(width: PreviewTitle.barHeight, height: PreviewTitle.barHeight)
-                            .glassEffect(.regular.tint(.black.opacity(0.35)).interactive(), in: .circle)
-                            .environment(\.colorScheme, .dark)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Close")
-                    Spacer()
-                }
-            }
-        }
-        .padding(.horizontal, Space.page)
-        .padding(.top, 5)
-    }
-}
-
-/// Our own action row: one clear icon per action, floating over the photo in Liquid Glass. It observes
-/// favorites and review decisions itself, so toggling one re-renders only this row.
-private struct PreviewActionBar: View {
-    let assetID: String
-    let preparingShare: Bool
-    let onShare: (PHAsset) -> Void
-    let onAlbum: () -> Void
-    let onInfo: () -> Void
-    let onLimit: () -> Void
-    let flash: (String) -> Void
     @Environment(PhotoLibrary.self) private var library
-    @Environment(ReviewStore.self) private var reviews
 
     var body: some View {
         let asset = library.asset(for: assetID)
         let favorite = asset.map(library.isFavorite) ?? false
+        Button(favorite ? "Unfavorite" : "Favorite", systemImage: favorite ? "heart.fill" : "heart") {
+            guard let asset else { return }
+            Task { try? await library.setFavorite([asset], !favorite) }
+        }
+        .tint(favorite ? Brand.blush : nil)
+        .sensoryFeedback(.selection, trigger: favorite)
+    }
+}
+
+/// Mark for deletion / unmark. Observes review decisions itself.
+private struct MarkToolbarButton: View {
+    let assetID: String
+    let onLimit: () -> Void
+    let flash: (String) -> Void
+    @Environment(ReviewStore.self) private var reviews
+
+    var body: some View {
         let marked = reviews.decision(for: assetID) == .marked
-        GlassEffectContainer(spacing: Space.s) {
-          HStack {
-            actionButton(favorite ? "Unfavorite" : "Favorite", favorite ? "heart.fill" : "heart",
-                         tint: favorite ? Brand.blush : .white) {
-                guard let asset else { return }
-                Task { try? await library.setFavorite([asset], !favorite) }
-            }
-            Spacer()
-            actionButton("Share", "square.and.arrow.up", busy: preparingShare) {
-                guard let asset else { return }
-                onShare(asset)
-            }
-            Spacer()
-            actionButton("Add to Album", "rectangle.stack.badge.plus", action: onAlbum)
-            Spacer()
-            actionButton("Info", "info.circle", action: onInfo)
-            Spacer()
-            actionButton(marked ? "Unmark" : "Mark for deletion", marked ? "trash.slash" : "trash",
-                         tint: marked ? Color.appDanger : .white) {
-                if marked {
-                    reviews.unmark([assetID])
-                    flash(String(localized: "Removed from the deletion queue"))
-                } else {
-                    do {
-                        try reviews.decide(.marked, ids: [assetID])
-                        flash(String(localized: "Marked for deletion. Nothing is deleted until you review."))
-                    } catch {
-                        onLimit()
-                    }
+        Button(marked ? "Unmark" : "Mark for deletion", systemImage: marked ? "trash.slash" : "trash") {
+            if marked {
+                reviews.unmark([assetID])
+                flash(String(localized: "Removed from the deletion queue"))
+            } else {
+                do {
+                    try reviews.decide(.marked, ids: [assetID])
+                    flash(String(localized: "Marked for deletion. Nothing is deleted until you review."))
+                } catch {
+                    onLimit()
                 }
             }
-          }
         }
-        .padding(.horizontal, Space.xl)
-        .padding(.vertical, Space.xs)
-        .sensoryFeedback(.selection, trigger: favorite)
+        .tint(marked ? Color.appDanger : nil)
         .sensoryFeedback(.selection, trigger: marked)
-    }
-
-    private func actionButton(_ label: LocalizedStringKey, _ icon: String, tint: Color = .white, busy: Bool = false,
-                              action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            ZStack {
-                if busy { ProgressView().tint(.white) } else { Image(systemName: icon).font(.title3.weight(.semibold)) }
-            }
-            .foregroundStyle(tint)
-            .frame(width: 52, height: 52)
-            // A dark tint keeps the white symbols legible over bright photos.
-            .glassEffect(.regular.tint(.black.opacity(0.35)).interactive(), in: .circle)
-            .environment(\.colorScheme, .dark)
-        }
-        .buttonStyle(.plain)
-        .disabled(busy)
-        .accessibilityLabel(label)
     }
 }
 
