@@ -1,0 +1,40 @@
+{
+  "locale": "es-MX",
+  "name": "Shotsy: Limpiar y Borrar Fotos",
+  "subtitle": "Liberar espacio y duplicadas",
+  "keywords": "eliminar,deslizando,repetidas,almacenamiento,limpiador,galería,organizar,similares,capturas,gratis",
+  "promotional_text": "Desliza a la derecha para conservar y a la izquierda para descartar. Shotsy te ayuda a ordenar tu carrete en minutos, y nada se borra sin tu permiso.",
+  "description": "Haz espacio para las fotos que amas.\n\nShotsy convierte un carrete enorme en sesiones cortas y fáciles de ordenar. Desliza a la derecha para conservar una foto y a la izquierda para marcarla. Nada se elimina hasta que lo revises y confirmes.\n\nDESLIZA PARA ORDENAR\n• Una foto a la vez, grande y clara\n• Conserva, marca, omite o deshaz con un toque\n• Ordena por mes o usa Rápidas 20 cuando tengas un minuto\n• Tu progreso se guarda, así que puedes parar cuando quieras\n\nLIMPIA DE FORMA MÁS INTELIGENTE\n• Encuentra fotos similares y elige la mejor\n• Detecta duplicados exactos, verificados byte por byte\n• Identifica fotos borrosas y videos pesados\n• Comprime videos grandes en copias más ligeras y conserva los originales\n\nCONTROLA TUS CAPTURAS DE PANTALLA\n• Una bandeja de capturas para recibos, boletos, recetas y más\n• Busca el texto dentro de tus capturas\n• Fija y etiqueta las que necesitas\n\nMANTÉN TODO EN ORDEN\n• Explora tu fototeca por mes\n• Crea y edita álbumes\n• Colecciones inteligentes que se actualizan solas\n• Recuerdos de Un día como hoy\n• Etiqueta a las personas en tus fotos\n\nPRIVACIDAD DESDE EL DISEÑO\nShotsy analiza tus fotos en tu iPhone. Tus fotos, el texto de tus capturas y los rostros nunca salen de tu dispositivo. Los elementos eliminados van a Eliminado recientemente en Fotos, así que puedes recuperarlos durante unos 30 días.\n\nSHOTSY PRO\nOrdenar es gratis todos los días. Shotsy Pro desbloquea orden ilimitado, limpieza con un toque, búsqueda en capturas y más.\n• Semanal: $1.99 USD por semana, se renueva automáticamente hasta que la canceles\n• De por vida: $19.99 USD, un solo pago\nLos precios pueden variar según el país. El pago se carga a tu Cuenta de Apple. Las suscripciones se renuevan a menos que se cancelen al menos 24 horas antes del final del periodo actual. Administra o cancela en cualquier momento desde la configuración de tu Cuenta de Apple.\n\nTérminos de uso: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/",
+  "screenshots": [
+    {
+      "id": "01-swipe",
+      "title": "Desliza para limpiar tus fotos",
+      "caption": "Derecha para guardar, izquierda para borrar",
+      "sticker": "Guardar|Borrar"
+    },
+    {
+      "id": "02-similar",
+      "title": "Borra fotos similares",
+      "caption": "Shotsy elige la toma más nítida",
+      "sticker": "Mejor toma"
+    },
+    {
+      "id": "03-clean",
+      "title": "Libera espacio en tu iPhone",
+      "caption": "Duplicados, fotos borrosas, videos pesados",
+      "sticker": "Todo en tu iPhone"
+    },
+    {
+      "id": "04-library",
+      "title": "Todas tus fotos, en orden",
+      "caption": "Recorre tu fototeca mes a mes",
+      "sticker": "Busca texto en capturas"
+    },
+    {
+      "id": "05-review",
+      "title": "Nada se borra por sorpresa",
+      "caption": "Revisa todo antes de borrar",
+      "sticker": "Recuperable por 30 días"
+    }
+  ]
+}

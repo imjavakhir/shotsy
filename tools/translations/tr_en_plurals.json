@@ -1,0 +1,126 @@
+{
+  "%lld free reviews left today": {
+    "one": "%lld free review left today",
+    "other": "%lld free reviews left today"
+  },
+  "%lld groups": {
+    "one": "%lld group",
+    "other": "%lld groups"
+  },
+  "%lld identical files": {
+    "one": "%lld identical file",
+    "other": "%lld identical files"
+  },
+  "%lld items": {
+    "one": "%lld item",
+    "other": "%lld items"
+  },
+  "%lld items couldn't be checked yet (not indexed, or size unknown). They're not counted as matches.": {
+    "one": "%lld item couldn't be checked yet (not indexed, or size unknown). It's not counted as a match.",
+    "other": "%lld items couldn't be checked yet (not indexed, or size unknown). They're not counted as matches."
+  },
+  "%lld items were already gone, so they were removed from the queue.": {
+    "one": "%lld item was already gone, so it was removed from the queue.",
+    "other": "%lld items were already gone, so they were removed from the queue."
+  },
+  "%lld memories": {
+    "one": "%lld memory",
+    "other": "%lld memories"
+  },
+  "%lld originals couldn't be read, so those stay unverified.": {
+    "one": "%lld original couldn't be read, so it stays unverified.",
+    "other": "%lld originals couldn't be read, so those stay unverified."
+  },
+  "%lld people": {
+    "one": "%lld person",
+    "other": "%lld people"
+  },
+  "%lld photos": {
+    "one": "%lld photo",
+    "other": "%lld photos"
+  },
+  "%lld screenshots": {
+    "one": "%lld screenshot",
+    "other": "%lld screenshots"
+  },
+  "%lld similar photos": {
+    "one": "%lld similar photo",
+    "other": "%lld similar photos"
+  },
+  "%lld suggestions": {
+    "one": "%lld suggestion",
+    "other": "%lld suggestions"
+  },
+  "%lld verified groups": {
+    "one": "%lld verified group",
+    "other": "%lld verified groups"
+  },
+  "%lld videos": {
+    "one": "%lld video",
+    "other": "%lld videos"
+  },
+  "%lld videos are only in iCloud, so their size isn't known here. They're listed after, longest first, and this order may be incomplete.": {
+    "one": "%lld video is only in iCloud, so its size isn't known here. It's listed after, longest first, and this order may be incomplete.",
+    "other": "%lld videos are only in iCloud, so their size isn't known here. They're listed after, longest first, and this order may be incomplete."
+  },
+  "%lld years ago": {
+    "one": "%lld year ago",
+    "other": "%lld years ago"
+  },
+  "Automatic grouping preview covers up to %lld photos. Shotsy Pro groups your whole library.": {
+    "one": "Automatic grouping preview covers up to %lld photo. Shotsy Pro groups your whole library.",
+    "other": "Automatic grouping preview covers up to %lld photos. Shotsy Pro groups your whole library."
+  },
+  "Create album with %lld items": {
+    "one": "Create album with %lld item",
+    "other": "Create album with %lld items"
+  },
+  "Created the Photos album “%@” with %lld screenshots. It won't update automatically.": {
+    "one": "Created the Photos album “%@” with %lld screenshot. It won't update automatically.",
+    "other": "Created the Photos album “%@” with %lld screenshots. It won't update automatically."
+  },
+  "Delete %lld items": {
+    "one": "Delete %lld item",
+    "other": "Delete %lld items"
+  },
+  "Delete %lld items from Photos?": {
+    "one": "Delete %lld item from Photos?",
+    "other": "Delete %lld items from Photos?"
+  },
+  "Deleted %lld items. They're in Recently Deleted in Photos for about 30 days if you change your mind.": {
+    "one": "Deleted %lld item. It's in Recently Deleted in Photos for about 30 days if you change your mind.",
+    "other": "Deleted %lld items. They're in Recently Deleted in Photos for about 30 days if you change your mind."
+  },
+  "Deleted %lld items. They're in Recently Deleted in Photos.": {
+    "one": "Deleted %lld item. It's in Recently Deleted in Photos.",
+    "other": "Deleted %lld items. They're in Recently Deleted in Photos."
+  },
+  "Marked %lld. Review them in Review deletions.": {
+    "one": "Marked %lld. Review it in Review deletions.",
+    "other": "Marked %lld. Review them in Review deletions."
+  },
+  "Newer than %lld days": {
+    "one": "Newer than %lld day",
+    "other": "Newer than %lld days"
+  },
+  "Older than %lld days": {
+    "one": "Older than %lld day",
+    "other": "Older than %lld days"
+  },
+  "Read on this iPhone. %lld screenshots indexed so far. Recognized languages: %@.": {
+    "one": "Read on this iPhone. %lld screenshot indexed so far. Recognized languages: %@.",
+    "other": "Read on this iPhone. %lld screenshots indexed so far. Recognized languages: %@."
+  },
+  "Review %lld photos": {
+    "one": "Review %lld photo",
+    "other": "Review %lld photos"
+  },
+  "That's today's %lld free reviews": {
+    "one": "That's today's %lld free review",
+    "other": "That's today's %lld free reviews"
+  },
+  "Verify %lld candidate groups": {
+    "one": "Verify %lld candidate group",
+    "other": "Verify %lld candidate groups"
+  }
+}

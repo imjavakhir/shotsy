@@ -1,0 +1,40 @@
+{
+  "locale": "vi",
+  "name": "Shotsy: Dọn Dẹp & Xoá Ảnh",
+  "subtitle": "Giải phóng dung lượng iPhone",
+  "keywords": "trùng lặp,xóa ảnh,dọn rác,bộ nhớ,thư viện ảnh,nén video,sắp xếp,tương tự,mờ,chụp màn hình,album",
+  "promotional_text": "Vuốt phải để giữ, vuốt trái để bỏ. Shotsy giúp bạn dọn sạch Thư viện ảnh chỉ vài phút mỗi lần, và không gì bị xóa cho đến khi bạn đồng ý.",
+  "description": "Dành chỗ cho những bức ảnh bạn yêu thích.\n\nShotsy biến cuộn camera khổng lồ thành những phiên sắp xếp ngắn gọn, dễ dàng. Vuốt phải để giữ ảnh, vuốt trái để đánh dấu. Không gì bị xóa cho đến khi bạn xem lại và xác nhận.\n\nVUỐT ĐỂ SẮP XẾP\n• Từng ảnh một, to và rõ nét\n• Giữ, đánh dấu, bỏ qua hoặc hoàn tác chỉ với một chạm\n• Sắp xếp theo tháng hoặc thử Quick 20 khi rảnh một phút\n• Tiến trình được lưu lại, bạn có thể dừng bất cứ lúc nào\n\nDỌN DẸP THÔNG MINH HƠN\n• Tìm ảnh tương tự và chọn tấm đẹp nhất\n• Phát hiện ảnh trùng lặp chính xác, kiểm tra từng byte\n• Tìm ảnh bị mờ và video dung lượng lớn\n• Nén video lớn thành bản sao nhỏ hơn mà vẫn giữ bản gốc\n\nQUẢN LÝ ẢNH CHỤP MÀN HÌNH\n• Hộp thư Ảnh chụp màn hình cho hóa đơn, vé, công thức nấu ăn và hơn thế nữa\n• Tìm kiếm chữ bên trong ảnh chụp màn hình\n• Ghim và gắn nhãn những ảnh bạn cần\n\nLUÔN GỌN GÀNG\n• Duyệt thư viện theo từng tháng\n• Tạo và chỉnh sửa album\n• Bộ sưu tập thông minh tự động cập nhật\n• Kỷ niệm Ngày này năm xưa\n• Gắn thẻ người trong ảnh\n\nRIÊNG TƯ NGAY TỪ THIẾT KẾ\nShotsy phân tích ảnh ngay trên iPhone của bạn. Ảnh, chữ trong ảnh chụp màn hình và khuôn mặt không bao giờ rời khỏi thiết bị. Các mục đã xóa sẽ chuyển vào Đã xóa gần đây trong ứng dụng Ảnh, nên bạn có thể khôi phục trong khoảng 30 ngày.\n\nSHOTSY PRO\nSắp xếp miễn phí mỗi ngày. Shotsy Pro mở khóa sắp xếp không giới hạn, dọn dẹp một chạm, tìm kiếm ảnh chụp màn hình và nhiều hơn nữa.\n• Hàng tuần: 1,99 US$ mỗi tuần, tự động gia hạn cho đến khi hủy\n• Trọn đời: 19,99 US$, mua một lần\nGiá có thể khác nhau tùy quốc gia. Khoản thanh toán được tính vào Tài khoản Apple của bạn. Gói đăng ký sẽ tự động gia hạn trừ khi được hủy ít nhất 24 giờ trước khi kết thúc kỳ hiện tại. Quản lý hoặc hủy bất cứ lúc nào trong cài đặt Tài khoản Apple.\n\nĐiều khoản sử dụng: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/",
+  "screenshots": [
+    {
+      "id": "01-swipe",
+      "title": "Vuốt để dọn ảnh",
+      "caption": "Phải để giữ, trái để xóa",
+      "sticker": "Giữ|Xóa"
+    },
+    {
+      "id": "02-similar",
+      "title": "Xóa ảnh giống nhau",
+      "caption": "Shotsy chọn tấm nét nhất",
+      "sticker": "Ảnh đẹp nhất"
+    },
+    {
+      "id": "03-clean",
+      "title": "Giải phóng dung lượng iPhone",
+      "caption": "Ảnh trùng, ảnh mờ, video lớn",
+      "sticker": "Xử lý ngay trên máy"
+    },
+    {
+      "id": "04-library",
+      "title": "Mọi ảnh gọn gàng",
+      "caption": "Xem thư viện theo từng tháng",
+      "sticker": "Tìm chữ trong ảnh chụp màn hình"
+    },
+    {
+      "id": "05-review",
+      "title": "Không xóa bất ngờ",
+      "caption": "Xem lại mọi thứ trước khi xóa",
+      "sticker": "Khôi phục trong 30 ngày"
+    }
+  ]
+}

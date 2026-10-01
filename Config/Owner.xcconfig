@@ -1,0 +1,9 @@
+// Owner configuration: the one place for values only the app owner can provide.
+// Replace every EXAMPLE value before distributing. See README.md → "Owner configuration".
+
+// App Store bundle identifier (matches the "Shotsy - Photo Organizer" record in App Store Connect).
+SHOTSY_BUNDLE_ID = com.solo.shotsy
+// Your Apple Developer Team ID (10 characters). Empty = simulator / "Sign to Run Locally" only.
+SHOTSY_TEAM_ID = QP9NSF23QJ
+// URL scheme for deep links (reminder notifications).
+SHOTSY_URL_SCHEME = shotsy

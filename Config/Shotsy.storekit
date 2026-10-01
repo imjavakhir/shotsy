@@ -1,0 +1,64 @@
+{
+  "identifier" : "5A7C0A11",
+  "nonRenewingSubscriptions" : [ ],
+  "products" : [
+    {
+      "displayPrice" : "19.99",
+      "familyShareable" : false,
+      "internalID" : "6751000001",
+      "localizations" : [
+        {
+          "description" : "Shotsy Pro, one-time purchase.",
+          "displayName" : "Shotsy Pro Lifetime",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.solo.shotsy.pro.lifetime",
+      "referenceName" : "Shotsy Pro Lifetime",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6751000000",
+    "_developerTeamID" : "",
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [ ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21500001",
+      "localizations" : [ ],
+      "name" : "Shotsy Pro",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [ ],
+          "codeOffers" : [ ],
+          "displayPrice" : "1.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6751000002",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Shotsy Pro, renews every week until canceled.",
+              "displayName" : "Shotsy Pro Weekly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.solo.shotsy.pro.weekly",
+          "recurringSubscriptionPeriod" : "P1W",
+          "referenceName" : "Shotsy Pro Weekly",
+          "subscriptionGroupID" : "21500001",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [ ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "locale": "de-DE",
+  "name": "Shotsy: Fotos aussortieren",
+  "subtitle": "Speicher freigeben & aufräumen",
+  "keywords": "löschen,doppelte,duplikate,ähnliche,sortieren,bilder,swipe,speicherplatz,galerie,handy,reinigen",
+  "promotional_text": "Nach rechts behalten, nach links aussortieren. Mit Shotsy räumst du deine Mediathek in ein paar Minuten nebenbei auf – gelöscht wird erst, wenn du es bestätigst.",
+  "description": "Mach Platz für die Fotos, die du liebst.\n\nShotsy verwandelt eine riesige Mediathek in kurze, entspannte Sortierrunden. Wische nach rechts, um ein Foto zu behalten, nach links, um es zu markieren. Gelöscht wird nichts, bevor du alles geprüft und bestätigt hast.\n\nWISCHEN UND SORTIEREN\n• Ein Foto nach dem anderen, groß und deutlich\n• Behalten, markieren, überspringen oder rückgängig machen – mit einem Tipp\n• Nach Monat sortieren oder für zwischendurch „Quick 20“ starten\n• Dein Fortschritt wird gespeichert, du kannst jederzeit aufhören\n\nCLEVERER AUFRÄUMEN\n• Ähnliche Fotos finden und das beste auswählen\n• Exakte Duplikate erkennen, Byte für Byte geprüft\n• Unscharfe Aufnahmen und große Videos aufspüren\n• Große Videos in kleinere Kopien komprimieren und die Originale behalten\n\nSCREENSHOTS IM GRIFF\n• Eine Screenshot-Inbox für Belege, Tickets, Rezepte und mehr\n• Den Text in deinen Screenshots durchsuchen\n• Wichtige Screenshots anheften und beschriften\n\nALLES GUT ORGANISIERT\n• Deine Mediathek nach Monaten durchstöbern\n• Alben erstellen und bearbeiten\n• Intelligente Sammlungen, die sich selbst aktualisieren\n• „An diesem Tag“-Erinnerungen\n• Personen in deinen Fotos markieren\n\nPRIVATSPHÄRE AB WERK\nShotsy analysiert deine Fotos direkt auf deinem iPhone. Deine Fotos, der Text in Screenshots und Gesichter verlassen dein Gerät nie. Gelöschte Objekte landen in der App „Fotos“ unter „Zuletzt gelöscht“, sodass du sie etwa 30 Tage lang wiederherstellen kannst.\n\nSHOTSY PRO\nSortieren ist jeden Tag kostenlos. Shotsy Pro schaltet unbegrenztes Sortieren, Aufräumen mit einem Tipp, die Screenshot-Suche und mehr frei.\n• Wöchentlich: 1,99 $ pro Woche, verlängert sich automatisch bis zur Kündigung\n• Lebenslang: 19,99 $, einmaliger Kauf\nPreise können je nach Land variieren. Die Zahlung wird über deinen Apple Account abgerechnet. Abos verlängern sich automatisch, wenn sie nicht mindestens 24 Stunden vor Ende des aktuellen Zeitraums gekündigt werden. Du kannst sie jederzeit in den Einstellungen deines Apple Account verwalten oder kündigen.\n\nNutzungsbedingungen: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/",
+  "screenshots": [
+    {
+      "id": "01-swipe",
+      "title": "Wischen und Fotos aufräumen",
+      "caption": "Rechts behalten, links löschen",
+      "sticker": "Behalten|Löschen"
+    },
+    {
+      "id": "02-similar",
+      "title": "Ähnliche Fotos löschen",
+      "caption": "Shotsy wählt das schärfste Foto",
+      "sticker": "Bestes Foto"
+    },
+    {
+      "id": "03-clean",
+      "title": "iPhone-Speicher freigeben",
+      "caption": "Duplikate, unscharfe Fotos, große Videos",
+      "sticker": "Alles auf dem Gerät"
+    },
+    {
+      "id": "04-library",
+      "title": "Alle Fotos geordnet",
+      "caption": "Mediathek Monat für Monat durchgehen",
+      "sticker": "Text in Screenshots suchen"
+    },
+    {
+      "id": "05-review",
+      "title": "Nichts wird ungefragt gelöscht",
+      "caption": "Alles prüfen, bevor es weg ist",
+      "sticker": "30 Tage wiederherstellbar"
+    }
+  ]
+}

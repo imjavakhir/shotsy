@@ -1,0 +1,40 @@
+{
+  "locale": "fr-FR",
+  "name": "Shotsy: Nettoyer les photos",
+  "subtitle": "Supprimer doublons & stockage",
+  "keywords": "libérer,espace,nettoyage,nettoyeur,trier,similaires,galerie,captures,écran,compresser,vidéo,floues",
+  "promotional_text": "Glissez à droite pour garder, à gauche pour jeter. Shotsy vous aide à trier votre pellicule quelques minutes à la fois, et rien n'est supprimé sans votre accord.",
+  "description": "Faites de la place pour les photos que vous aimez.\n\nShotsy transforme une pellicule immense en petites séances de tri faciles. Glissez vers la droite pour garder une photo, vers la gauche pour la marquer. Rien n'est supprimé tant que vous n'avez pas vérifié et confirmé.\n\nTRIEZ D'UN GESTE\n• Une photo à la fois, en grand et bien nette\n• Gardez, marquez, passez ou annulez d'un toucher\n• Triez par mois ou lancez un Tri express de 20 quand vous avez une minute\n• Votre progression est enregistrée : arrêtez-vous quand vous voulez\n\nNETTOYEZ MALIN\n• Trouvez les photos similaires et gardez la meilleure\n• Repérez les doublons exacts, vérifiés octet par octet\n• Débusquez les photos floues et les vidéos volumineuses\n• Compressez les grosses vidéos en copies plus légères tout en gardant les originaux\n\nMAÎTRISEZ VOS CAPTURES D'ÉCRAN\n• Une boîte de réception pour vos reçus, billets, recettes et plus encore\n• Recherchez le texte dans vos captures d'écran\n• Épinglez et étiquetez celles dont vous avez besoin\n\nRESTEZ ORGANISÉ\n• Parcourez votre photothèque mois par mois\n• Créez et modifiez des albums\n• Des collections intelligentes qui se mettent à jour toutes seules\n• Les souvenirs « Ce jour-là »\n• Identifiez les personnes sur vos photos\n\nCONFIDENTIEL PAR NATURE\nShotsy analyse vos photos sur votre iPhone. Vos photos, le texte de vos captures et les visages ne quittent jamais votre appareil. Les éléments supprimés vont dans « Supprimés récemment » dans Photos, et vous pouvez les récupérer pendant environ 30 jours.\n\nSHOTSY PRO\nLe tri est gratuit chaque jour. Shotsy Pro débloque le tri illimité, le nettoyage en un toucher, la recherche dans les captures et plus encore.\n• Hebdomadaire : 1,99 $ US par semaine, renouvelé automatiquement jusqu'à résiliation\n• À vie : 19,99 $ US, achat unique\nLes prix peuvent varier selon le pays. Le paiement est débité sur votre compte Apple. Les abonnements sont renouvelés sauf s'ils sont annulés au moins 24 heures avant la fin de la période en cours. Gérez ou annulez à tout moment dans les réglages de votre compte Apple.\n\nConditions d'utilisation : https://www.apple.com/legal/internet-services/itunes/dev/stdeula/",
+  "screenshots": [
+    {
+      "id": "01-swipe",
+      "title": "Balayez pour trier vos photos",
+      "caption": "À droite on garde, à gauche on supprime",
+      "sticker": "Garder|Supprimer"
+    },
+    {
+      "id": "02-similar",
+      "title": "Supprimez les photos similaires",
+      "caption": "Shotsy choisit la plus nette",
+      "sticker": "Meilleure photo"
+    },
+    {
+      "id": "03-clean",
+      "title": "Libérez de l’espace sur iPhone",
+      "caption": "Doublons, photos floues, grosses vidéos",
+      "sticker": "100 % sur l’appareil"
+    },
+    {
+      "id": "04-library",
+      "title": "Toutes vos photos, en ordre",
+      "caption": "Parcourez votre photothèque mois par mois",
+      "sticker": "Cherchez le texte des captures"
+    },
+    {
+      "id": "05-review",
+      "title": "Rien n’est supprimé par surprise",
+      "caption": "Vérifiez tout avant de supprimer",
+      "sticker": "Récupérable 30 jours"
+    }
+  ]
+}

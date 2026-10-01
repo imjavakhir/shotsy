@@ -1,0 +1,234 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "CFBundleDisplayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy"
+          }
+        }
+      }
+    },
+    "NSPhotoLibraryAddUsageDescription": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy sichert komprimierte Videokopien in deiner Mediathek, wenn du darum bittest."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy guarda copias comprimidas de videos en tu fototeca cuando se lo pides."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy enregistre des copies de vidéos compressées dans votre photothèque quand vous le demandez."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy menyimpan salinan video terkompresi ke perpustakaan Anda saat Anda memintanya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy salva copie compresse dei video nella libreria quando glielo chiedi."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsyは、あなたが指示したときにだけ圧縮したビデオのコピーをライブラリに保存します。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy는 요청할 때만 압축된 비디오 사본을 보관함에 저장해요."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Shotsy salva cópias comprimidas de vídeos na sua biblioteca quando você pede."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy сохраняет сжатые копии видео в медиатеку, только когда вы попросите."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy lưu bản sao video đã nén vào thư viện khi bạn yêu cầu."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在你要求时，Shotsy 会将压缩后的视频副本存储到你的图库。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "只有在你要求時，Shotsy 才會將壓縮後的影片副本儲存到圖庫。"
+          }
+        }
+      }
+    },
+    "NSPhotoLibraryUsageDescription": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy sortiert, gruppiert und durchsucht deine Fotos auf diesem iPhone. Deine Mediathek ändert sich nur, wenn du eine Aktion wählst."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy ordena, agrupa y busca tus fotos en este iPhone. Solo cambia tu fototeca cuando eliges una acción."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy trie, regroupe et recherche vos photos sur cet iPhone. Votre photothèque ne change que lorsque vous choisissez une action."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy memilah, mengelompokkan, dan mencari foto Anda di iPhone ini. Perpustakaan Anda hanya berubah saat Anda memilih tindakan."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy ordina, raggruppa e cerca le tue foto su questo iPhone. Modifica la libreria solo quando scegli un'azione."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ShotsyはこのiPhone上で写真を整理、グループ分け、検索します。ライブラリが変更されるのは、あなたが操作を選んだときだけです。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy는 이 iPhone에서 사진을 정리, 그룹화, 검색해요. 동작을 선택할 때만 보관함이 변경됩니다."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Shotsy organiza, agrupa e busca suas fotos neste iPhone. Ele só altera sua biblioteca quando você escolhe uma ação."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy сортирует, группирует и ищет ваши фото на этом iPhone. Медиатека меняется, только когда вы выбираете действие."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy phân loại, nhóm và tìm kiếm ảnh ngay trên iPhone này. Thư viện chỉ thay đổi khi bạn chọn một tác vụ."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy 在这台 iPhone 上整理、分组和搜索你的照片。只有在你选择操作时才会更改你的图库。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shotsy 在這支 iPhone 上整理、分組和搜尋你的照片。只有在你選擇動作時才會更動圖庫。"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}
