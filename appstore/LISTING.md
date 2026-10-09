@@ -51,7 +51,7 @@ STAY ORGANIZED
 • On This Day memories
 
 PRIVATE BY DESIGN
-Shotsy analyzes your photos on your iPhone. Your photos and screenshot text never leave your device. Deleted items go to Recently Deleted in Photos, so you can recover them for about 30 days.
+Shotsy analyzes your photos right on your phone. Your photos and screenshot text never leave your device. Deleted items go to Recently Deleted in Photos, so you can recover them for about 30 days.
 
 SHOTSY PRO
 Sorting is free every day. Shotsy Pro unlocks unlimited sorting, one-tap cleanup, screenshot search and more.
@@ -117,7 +117,7 @@ Shotsy превращает огромную фотопленку в корот�
 • Воспоминания «В этот день»
 
 КОНФИДЕНЦИАЛЬНОСТЬ ПО УМОЛЧАНИЮ
-Shotsy анализирует фото прямо на вашем iPhone. Ваши фото и текст скриншотов никогда не покидают устройство. Удаленные объекты попадают в альбом «Недавно удаленные» в приложении «Фото», и их можно восстановить в течение примерно 30 дней.
+Shotsy анализирует фото прямо на вашем телефоне. Ваши фото и текст скриншотов никогда не покидают устройство. Удаленные объекты попадают в альбом «Недавно удаленные» в приложении «Фото», и их можно восстановить в течение примерно 30 дней.
 
 SHOTSY PRO
 Сортировка бесплатна каждый день. Shotsy Pro открывает безлимитную сортировку, очистку в одно касание, поиск по скриншотам и многое другое.
@@ -183,7 +183,7 @@ MANTÉN TODO EN ORDEN
 • Recuerdos de Un día como hoy
 
 PRIVACIDAD DESDE EL DISEÑO
-Shotsy analiza tus fotos en tu iPhone. Tus fotos y el texto de tus capturas nunca salen de tu dispositivo. Los elementos eliminados van a Eliminado recientemente en Fotos, así que puedes recuperarlos durante unos 30 días.
+Shotsy analiza tus fotos en tu teléfono. Tus fotos y el texto de tus capturas nunca salen de tu dispositivo. Los elementos eliminados van a Eliminado recientemente en Fotos, así que puedes recuperarlos durante unos 30 días.
 
 SHOTSY PRO
 Ordenar es gratis todos los días. Shotsy Pro desbloquea orden ilimitado, limpieza con un toque, búsqueda en capturas y más.
@@ -249,7 +249,7 @@ TUDO ORGANIZADO
 • Memórias de Neste Dia
 
 PRIVACIDADE EM PRIMEIRO LUGAR
-O Shotsy analisa suas fotos no seu iPhone. Suas fotos e o texto dos prints nunca saem do seu dispositivo. Os itens apagados vão para Apagados no app Fotos, e você pode recuperá-los por cerca de 30 dias.
+O Shotsy analisa suas fotos no seu celular. Suas fotos e o texto dos prints nunca saem do seu dispositivo. Os itens apagados vão para Apagados no app Fotos, e você pode recuperá-los por cerca de 30 dias.
 
 SHOTSY PRO
 Organizar é grátis todos os dias. O Shotsy Pro libera organização ilimitada, limpeza com um toque, busca em prints e muito mais.
@@ -315,7 +315,7 @@ RESTEZ ORGANISÉ
 • Les souvenirs « Ce jour-là »
 
 CONFIDENTIEL PAR NATURE
-Shotsy analyse vos photos sur votre iPhone. Vos photos et le texte de vos captures ne quittent jamais votre appareil. Les éléments supprimés vont dans « Supprimés récemment » dans Photos, et vous pouvez les récupérer pendant environ 30 jours.
+Shotsy analyse vos photos sur votre téléphone. Vos photos et le texte de vos captures ne quittent jamais votre appareil. Les éléments supprimés vont dans « Supprimés récemment » dans Photos, et vous pouvez les récupérer pendant environ 30 jours.
 
 SHOTSY PRO
 Le tri est gratuit chaque jour. Shotsy Pro débloque le tri illimité, le nettoyage en un toucher, la recherche dans les captures et plus encore.
@@ -381,7 +381,7 @@ ALLES GUT ORGANISIERT
 • „An diesem Tag“-Erinnerungen
 
 PRIVATSPHÄRE AB WERK
-Shotsy analysiert deine Fotos direkt auf deinem iPhone. Deine Fotos und der Text in Screenshots verlassen dein Gerät nie. Gelöschte Objekte landen in der App „Fotos“ unter „Zuletzt gelöscht“, sodass du sie etwa 30 Tage lang wiederherstellen kannst.
+Shotsy analysiert deine Fotos direkt auf deinem Handy. Deine Fotos und der Text in Screenshots verlassen dein Gerät nie. Gelöschte Objekte landen in der App „Fotos“ unter „Zuletzt gelöscht“, sodass du sie etwa 30 Tage lang wiederherstellen kannst.
 
 SHOTSY PRO
 Sortieren ist jeden Tag kostenlos. Shotsy Pro schaltet unbegrenztes Sortieren, Aufräumen mit einem Tipp, die Screenshot-Suche und mehr frei.
@@ -447,7 +447,7 @@ TUTTO IN ORDINE
 • Ricordi di "Accadde oggi"
 
 PRIVACY FIN DAL PROGETTO
-Shotsy analizza le tue foto direttamente sul tuo iPhone. Le tue foto e il testo degli screenshot non lasciano mai il tuo dispositivo. Gli elementi eliminati finiscono in "Eliminati di recente" nell'app Foto, così puoi recuperarli per circa 30 giorni.
+Shotsy analizza le tue foto direttamente sul tuo telefono. Le tue foto e il testo degli screenshot non lasciano mai il tuo dispositivo. Gli elementi eliminati finiscono in "Eliminati di recente" nell'app Foto, così puoi recuperarli per circa 30 giorni.
 
 SHOTSY PRO
 Riordinare è gratis ogni giorno. Shotsy Pro sblocca riordino illimitato, pulizia con un tocco, ricerca negli screenshot e altro ancora.
@@ -513,7 +513,7 @@ Shotsyは、膨大なカメラロールを短く気軽な整理タイムに変�
 • 「この日の思い出」
 
 プライバシーを最優先に
-Shotsyは写真をiPhone上で解析します。写真やスクリーンショットの文字がデバイスの外に出ることはありません。削除した項目は「写真」Appの「最近削除した項目」に移動するので、約30日間は復元できます。
+Shotsyは写真をスマートフォン上で解析します。写真やスクリーンショットの文字がデバイスの外に出ることはありません。削除した項目は「写真」Appの「最近削除した項目」に移動するので、約30日間は復元できます。
 
 SHOTSY PRO
 仕分けは毎日無料。Shotsy Proでは、無制限の仕分け、ワンタップのクリーンアップ、スクリーンショット検索などが利用できます。
@@ -579,7 +579,7 @@ Shotsy는 방대한 카메라 롤을 짧고 쉬운 정리 시간으로 바꿔 �
 • 오늘의 추억(On This Day)
 
 처음부터 개인정보 보호
-Shotsy는 사진을 iPhone에서 직접 분석합니다. 사진과 스크린샷 텍스트는 절대 기기 밖으로 나가지 않습니다. 삭제한 항목은 사진 앱의 '최근 삭제된 항목'으로 이동하므로 약 30일 동안 복구할 수 있습니다.
+Shotsy는 사진을 휴대폰에서 직접 분석합니다. 사진과 스크린샷 텍스트는 절대 기기 밖으로 나가지 않습니다. 삭제한 항목은 사진 앱의 '최근 삭제된 항목'으로 이동하므로 약 30일 동안 복구할 수 있습니다.
 
 SHOTSY PRO
 분류는 매일 무료입니다. Shotsy Pro를 사용하면 무제한 분류, 탭 한 번으로 정리, 스크린샷 검색 등을 이용할 수 있습니다.
@@ -645,7 +645,7 @@ Shotsy 把庞大的相机胶卷变成一次次轻松的小整理。右滑保留�
 • 历史上的今天
 
 隐私为先
-Shotsy 在你的 iPhone 上分析照片。你的照片和截图文字绝不会离开你的设备。删除的项目会移到“照片”App 的“最近删除”中，大约 30 天内都可以恢复。
+Shotsy 在你的手机上分析照片。你的照片和截图文字绝不会离开你的设备。删除的项目会移到“照片”App 的“最近删除”中，大约 30 天内都可以恢复。
 
 SHOTSY PRO
 每天都可以免费整理。Shotsy Pro 解锁无限次整理、一键清理、截图搜索等功能。
@@ -711,7 +711,7 @@ Shotsy 把龐大的相機膠卷變成一次次輕鬆的小整理。向右滑動�
 • 歷史上的今天
 
 隱私至上
-Shotsy 在你的 iPhone 上分析照片。你的照片和截圖文字絕不會離開你的裝置。刪除的項目會移到「照片」App 的「最近刪除」中，大約 30 天內都能復原。
+Shotsy 在你的手機上分析照片。你的照片和截圖文字絕不會離開你的裝置。刪除的項目會移到「照片」App 的「最近刪除」中，大約 30 天內都能復原。
 
 SHOTSY PRO
 每天都能免費分類。Shotsy Pro 可解鎖無限次分類、一鍵清理、截圖搜尋等功能。
@@ -777,7 +777,7 @@ TETAP TERATUR
 • Kenangan Hari Ini di Masa Lalu
 
 PRIVAT SEJAK AWAL
-Shotsy menganalisis fotomu langsung di iPhone. Foto dan teks tangkapan layar tidak pernah meninggalkan perangkatmu. Item yang dihapus masuk ke Baru Dihapus di app Foto, jadi kamu bisa memulihkannya selama sekitar 30 hari.
+Shotsy menganalisis fotomu langsung di ponsel. Foto dan teks tangkapan layar tidak pernah meninggalkan perangkatmu. Item yang dihapus masuk ke Baru Dihapus di app Foto, jadi kamu bisa memulihkannya selama sekitar 30 hari.
 
 SHOTSY PRO
 Memilah gratis setiap hari. Shotsy Pro membuka pemilahan tanpa batas, pembersihan sekali ketuk, pencarian tangkapan layar, dan lainnya.
@@ -843,7 +843,7 @@ LUÔN GỌN GÀNG
 • Kỷ niệm Ngày này năm xưa
 
 RIÊNG TƯ NGAY TỪ THIẾT KẾ
-Shotsy phân tích ảnh ngay trên iPhone của bạn. Ảnh và chữ trong ảnh chụp màn hình không bao giờ rời khỏi thiết bị. Các mục đã xóa sẽ chuyển vào Đã xóa gần đây trong ứng dụng Ảnh, nên bạn có thể khôi phục trong khoảng 30 ngày.
+Shotsy phân tích ảnh ngay trên điện thoại của bạn. Ảnh và chữ trong ảnh chụp màn hình không bao giờ rời khỏi thiết bị. Các mục đã xóa sẽ chuyển vào Đã xóa gần đây trong ứng dụng Ảnh, nên bạn có thể khôi phục trong khoảng 30 ngày.
 
 SHOTSY PRO
 Sắp xếp miễn phí mỗi ngày. Shotsy Pro mở khóa sắp xếp không giới hạn, dọn dẹp một chạm, tìm kiếm ảnh chụp màn hình và nhiều hơn nữa.
