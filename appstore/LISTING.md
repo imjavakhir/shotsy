@@ -803,7 +803,7 @@ Shotsy: Dọn Dẹp & Xoá Ảnh
 ```
 **Subtitle** (28/30)
 ```
-Giải phóng dung lượng iPhone
+Giải phóng dung lượng ảnh
 ```
 **Keywords** (95/100)
 ```

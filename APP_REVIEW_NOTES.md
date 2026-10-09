@@ -4,8 +4,9 @@
 similar photos and screenshots, compress large videos into new copies, and keep albums tidy. All analysis runs on
 the device. There is no account and no server.
 
-**Photo library permission.** Shotsy asks for photo access only after the user taps "Continue" in
-onboarding. It works with full or limited access (with a "Manage" control for limited access). Settings, restore
+**Photo library permission.** The last onboarding screen explains why photos are needed and has a single
+"Continue" button that always opens the system permission prompt (no skip). If the user declines, the app shows a
+short explanation with an "Open Settings" link. It works with full or limited access (with a "Manage" control for limited access). Settings, restore
 purchases, and legal links are available without photo access. Usage strings:
 - NSPhotoLibraryUsageDescription: sorting, grouping, and searching photos on this iPhone; the library changes only
   when the user chooses an action.

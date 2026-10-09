@@ -35,9 +35,8 @@ struct OnboardingView: View {
                     }
                     .buttonStyle(.primary)
                     .disabled(connecting)
-                    Button("Not now") { settings.hasOnboarded = true; model.start() }
-                        .font(.appHeadline)
-                        .frame(minHeight: Space.minTap)
+                    // No skip here (App Review 5.1.1(iv)): this screen always leads to the system prompt.
+                    // Declining there still finishes onboarding; the app explains and links to Settings.
                 }
             }
             .padding(.horizontal, Space.xl)
