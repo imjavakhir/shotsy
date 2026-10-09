@@ -159,8 +159,10 @@ def replace_screenshots(api, loc_id, display_type, files):
     if sets:
         set_id = sets[0]["id"]
         existing = api.call(f"appScreenshotSets/{set_id}/appScreenshots?limit=10")["data"]
-        # Already there from an earlier run (same files, same order, processed): leave it.
-        if ([x["attributes"]["fileName"] for x in existing] == [f.name for f in files]
+        # Already there from an earlier run (same contents, same order, processed): leave it.
+        # Compare checksums, not names: re-rendered slides keep their file names.
+        if ([x["attributes"].get("sourceFileChecksum") for x in existing]
+                == [hashlib.md5(f.read_bytes()).hexdigest() for f in files]
                 and all(x["attributes"]["assetDeliveryState"]["state"] == "COMPLETE" for x in existing)):
             return False
         for old in existing:
